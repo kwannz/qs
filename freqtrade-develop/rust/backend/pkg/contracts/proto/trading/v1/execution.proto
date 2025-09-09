@@ -1,0 +1,196 @@
+syntax = "proto3";
+package trading.v1;
+
+import "trading/v1/common.proto";
+
+// Sprint 1 - PlaceOrder 请求 (符合Sprint 1规范)
+message PlaceOrderRequest {
+  string account_id = 1;
+  string symbol = 2;
+  string side = 3;          // buy/sell
+  string type = 4;          // market/limit
+  string idempotency_key = 5; // Sprint 1 requirement
+  double quantity = 6;
+  double price = 7;         // optional for market
+  optional string time_in_force = 8; // GTC/IOC/FOK
+  optional string strategy_id = 9;
+  optional string tenant = 10; // 保持向后兼容
+}
+
+// Sprint 1 - PlaceOrder 响应 (符合Sprint 1规范) 
+message PlaceOrderResponse {
+  string client_order_id = 1;
+  string status = 2;        // accepted/rejected
+  optional string error_message = 3;
+  int64 accepted_at_ms = 4;
+}
+
+// 原有订单提交请求 (保持向后兼容)
+message OrderRequest {
+  string tenant = 1;
+  string symbol = 2;
+  string side = 3; // BUY/SELL/LONG/SHORT
+  double quantity = 4;
+  double price = 5; // optional for market orders
+  string order_type = 6; // MARKET/LIMIT/STOP_LOSS/TAKE_PROFIT
+  string time_in_force = 7; // GTC/IOC/FOK/GTD
+  string strategy_id = 8;
+  map<string, string> metadata = 9;
+  string idempotency_key = 10;
+}
+
+// 订单状态响应
+message OrderStatus {
+  string id = 1;
+  string client_order_id = 2;
+  string exchange_order_id = 3;
+  string status = 4; // PENDING/SUBMITTED/PARTIAL/FILLED/CANCELLED/REJECTED
+  string symbol = 5;
+  string side = 6;
+  double quantity = 7;
+  double filled_quantity = 8;
+  double average_price = 9;
+  int64 created_at_ms = 10;
+  int64 updated_at_ms = 11;
+  string reject_reason = 12;
+  repeated ExecutionReport executions = 13;
+}
+
+// 成交报告
+message ExecutionReport {
+  string execution_id = 1;
+  string order_id = 2;
+  string symbol = 3;
+  string side = 4;
+  double executed_quantity = 5;
+  double executed_price = 6;
+  double commission = 7;
+  string commission_asset = 8;
+  int64 execution_time_ms = 9;
+  string liquidity = 10; // MAKER/TAKER
+  map<string, string> execution_metadata = 11;
+}
+
+// 批量订单请求
+message BatchOrderRequest {
+  string tenant = 1;
+  repeated OrderRequest orders = 2;
+  bool atomic = 3; // 是否原子执行
+  string batch_id = 4;
+  string idempotency_key = 5;
+}
+
+// 批量订单响应
+message BatchOrderResponse {
+  string batch_id = 1;
+  string status = 2; // ACCEPTED/PARTIAL/COMPLETED/FAILED
+  repeated OrderStatus order_statuses = 3;
+  repeated string failed_orders = 4;
+  string error_message = 5;
+}
+
+// 订单取消请求
+message CancelOrderRequest {
+  string tenant = 1;
+  string order_id = 2;
+  string client_order_id = 3;
+  string symbol = 4;
+}
+
+// 取消响应
+message CancelResponse {
+  string order_id = 1;
+  bool cancelled = 2;
+  string reason = 3;
+}
+
+// 持仓查询
+message PositionQuery {
+  string tenant = 1;
+  string symbol = 2; // optional, all if empty
+  string strategy_id = 3; // optional
+}
+
+// 持仓信息
+message PositionInfo {
+  string tenant = 1;
+  string symbol = 2;
+  string side = 3; // LONG/SHORT/FLAT
+  double quantity = 4;
+  double average_price = 5;
+  double unrealized_pnl = 6;
+  double realized_pnl = 7;
+  double margin = 8;
+  int64 updated_at_ms = 9;
+  string strategy_id = 10;
+}
+
+// 账户查询
+message AccountQuery {
+  string tenant = 1;
+  string asset = 2; // optional, all if empty
+}
+
+// 账户余额
+message AccountBalance {
+  string tenant = 1;
+  string asset = 2;
+  double total_balance = 3;
+  double available_balance = 4;
+  double frozen_balance = 5;
+  double margin_balance = 6; // for futures
+  int64 updated_at_ms = 7;
+}
+
+// 执行统计
+message ExecutionStats {
+  string tenant = 1;
+  string symbol = 2;
+  int64 total_orders = 3;
+  int64 filled_orders = 4;
+  int64 cancelled_orders = 5;
+  int64 rejected_orders = 6;
+  double total_volume = 7;
+  double total_notional = 8;
+  double average_fill_time_ms = 9;
+  double fill_rate = 10;
+  int64 stats_period_start_ms = 11;
+  int64 stats_period_end_ms = 12;
+}
+
+// 执行服务定义
+service ExecutionService {
+  // Sprint 1 - 标准接口 (符合Sprint 1规范)
+  rpc PlaceOrder(PlaceOrderRequest) returns (PlaceOrderResponse);
+  
+  // 单订单操作 (保持向后兼容)
+  rpc SubmitOrder(OrderRequest) returns (JobAck);
+  rpc GetOrderStatus(JobId) returns (OrderStatus);
+  rpc CancelOrder(CancelOrderRequest) returns (CancelResponse);
+  rpc StreamOrderUpdates(JobId) returns (stream OrderStatus);
+
+  // 批量操作
+  rpc SubmitBatchOrders(BatchOrderRequest) returns (JobAck);
+  rpc GetBatchStatus(JobId) returns (BatchOrderResponse);
+  rpc StreamBatchUpdates(JobId) returns (stream BatchOrderResponse);
+
+  // 查询操作
+  rpc GetPositions(PositionQuery) returns (stream PositionInfo);
+  rpc GetAccountBalances(AccountQuery) returns (stream AccountBalance);
+  rpc GetExecutionStats(ExecutionStats) returns (ExecutionStats);
+
+  // 执行流监控
+  rpc StreamExecutions(ExecutionStats) returns (stream ExecutionReport);
+  
+  // 健康检查
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
+}
+
+// 健康检查消息
+message HealthCheckRequest {}
+
+message HealthCheckResponse {
+  string status = 1;  // SERVING, NOT_SERVING, UNKNOWN
+  map<string, string> details = 2;
+  int64 timestamp_ms = 3;
+}

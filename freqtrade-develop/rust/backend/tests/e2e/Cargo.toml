@@ -1,0 +1,25 @@
+[package]
+name = "e2e-tests"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tokio = { workspace = true, features = ["full"] }
+reqwest = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+uuid = { workspace = true }
+chrono = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+sqlx = { workspace = true }
+futures = "0.3"
+
+# Test framework
+tokio-test = "0.4"
+assert-json-diff = "2.0"
+
+[[bin]]
+name = "sprint8_e2e_tests"
+path = "src/main.rs"

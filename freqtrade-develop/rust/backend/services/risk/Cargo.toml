@@ -1,0 +1,57 @@
+[package]
+name = "risk-service"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Web framework
+axum = { workspace = true }
+tower = { workspace = true }
+tower-http = { workspace = true, features = ["cors", "trace"] }
+tokio = { workspace = true }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Database
+sqlx = { workspace = true }
+
+# Utilities
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+uuid = { workspace = true }
+chrono = { workspace = true }
+
+# Logging
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+# Config
+config = { workspace = true }
+toml = { workspace = true }
+
+# Async utilities
+async-trait = { workspace = true }
+
+# Decimal arithmetic for precise calculations
+rust_decimal = { workspace = true }
+rust_decimal_macros = { workspace = true }
+
+# Note: Shared crates integration to be added later
+# config-shared = { path = "../../shared/config" }
+# types-shared = { path = "../../shared/types" }
+# protocols-shared = { path = "../../shared/protocols" }
+# utils-shared = { path = "../../shared/utils" }
+# telemetry-shared = { path = "../../shared/telemetry" }
+
+# Metrics
+prometheus = { workspace = true }
+once_cell = { workspace = true }
+
+# Message queue
+async-nats = { workspace = true }
+
+[[bin]]
+name = "risk-service"
+path = "src/main.rs"

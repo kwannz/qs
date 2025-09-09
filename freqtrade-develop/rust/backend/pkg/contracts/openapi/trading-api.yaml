@@ -1,0 +1,929 @@
+openapi: 3.0.3
+info:
+  title: AG3 Trading Platform API
+  description: Unified trading platform API following AG3 specifications
+  version: 1.0.0
+  contact:
+    name: Trading Platform Team
+  license:
+    name: Proprietary
+
+servers:
+  - url: https://api.trading-platform.com/v1
+    description: Production server
+  - url: https://api-staging.trading-platform.com/v1
+    description: Staging server
+  - url: http://localhost:8080/v1
+    description: Development server
+
+paths:
+  /signals:
+    post:
+      summary: Publish trading signal
+      description: Submit a new trading signal with AG3 metadata
+      operationId: publishSignal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Signal'
+      responses:
+        '201':
+          description: Signal published successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignalResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+
+    get:
+      summary: Get signals
+      description: Retrieve signals with optional filtering
+      operationId: getSignals
+      parameters:
+        - name: strategy_name
+          in: query
+          schema:
+            type: string
+        - name: symbol
+          in: query
+          schema:
+            type: string
+        - name: min_confidence
+          in: query
+          schema:
+            type: number
+            format: double
+        - name: regime
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 100
+            maximum: 1000
+      responses:
+        '200':
+          description: Signals retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  signals:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Signal'
+                  total:
+                    type: integer
+                  has_more:
+                    type: boolean
+
+  /signals/{signalId}/quality:
+    get:
+      summary: Get signal quality metrics
+      description: Retrieve quality metrics for a specific signal
+      operationId: getSignalQuality
+      parameters:
+        - name: signalId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Signal quality metrics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignalQuality'
+
+  /orders:
+    post:
+      summary: Submit order
+      description: Submit a new order for execution
+      operationId: submitOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderRequest'
+      responses:
+        '201':
+          description: Order submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Risk check failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskCheckResult'
+
+    get:
+      summary: Get orders
+      description: Retrieve orders with optional filtering
+      operationId: getOrders
+      parameters:
+        - name: strategy_id
+          in: query
+          schema:
+            type: string
+        - name: symbol
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/OrderStatus'
+        - name: venue
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 100
+      responses:
+        '200':
+          description: Orders retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orders:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Order'
+
+  /orders/{orderId}:
+    get:
+      summary: Get order status
+      description: Retrieve current status of an order
+      operationId: getOrderStatus
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Order status retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      summary: Cancel order
+      description: Cancel an existing order
+      operationId: cancelOrder
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+      responses:
+        '200':
+          description: Order cancelled successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+
+  /executions:
+    get:
+      summary: Get executions
+      description: Retrieve execution reports
+      operationId: getExecutions
+      parameters:
+        - name: order_id
+          in: query
+          schema:
+            type: string
+        - name: symbol
+          in: query
+          schema:
+            type: string
+        - name: venue
+          in: query
+          schema:
+            type: string
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 100
+      responses:
+        '200':
+          description: Executions retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  executions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ExecutionReport'
+
+  /risk/check:
+    post:
+      summary: Perform risk check
+      description: Check if an order passes risk controls
+      operationId: checkRisk
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                order:
+                  $ref: '#/components/schemas/OrderRequest'
+                portfolio_id:
+                  type: string
+      responses:
+        '200':
+          description: Risk check completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskCheckResult'
+
+  /risk/metrics:
+    get:
+      summary: Get risk metrics
+      description: Retrieve portfolio or strategy risk metrics
+      operationId: getRiskMetrics
+      parameters:
+        - name: portfolio_id
+          in: query
+          schema:
+            type: string
+        - name: strategy_id
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Risk metrics retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskMetrics'
+
+  /market-data/{symbol}:
+    get:
+      summary: Get market data
+      description: Retrieve current market data for a symbol
+      operationId: getMarketData
+      parameters:
+        - name: symbol
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: include_book
+          in: query
+          schema:
+            type: boolean
+            default: false
+        - name: include_microstructure
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Market data retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarketData'
+
+  /market-data/{symbol}/historical:
+    get:
+      summary: Get historical market data
+      description: Retrieve historical market data for a symbol
+      operationId: getHistoricalData
+      parameters:
+        - name: symbol
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: start_time
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: end_time
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: granularity
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [1m, 5m, 15m, 1h, 4h, 1d]
+      responses:
+        '200':
+          description: Historical data retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MarketData'
+
+components:
+  schemas:
+    Signal:
+      type: object
+      required:
+        - symbol
+        - strategy_name
+        - strength
+        - confidence
+        - timestamp
+        - type
+        - direction
+      properties:
+        id:
+          type: string
+          readOnly: true
+        symbol:
+          type: string
+          example: "BTCUSDT"
+        strategy_name:
+          type: string
+          example: "momentum_v1"
+        strength:
+          type: number
+          format: double
+          minimum: -1.0
+          maximum: 1.0
+        confidence:
+          type: number
+          format: double
+          minimum: 0.0
+          maximum: 1.0
+          description: "AG3: Signal confidence level"
+        half_life:
+          type: integer
+          format: int64
+          description: "AG3: Signal half-life in seconds"
+        suggested_holding:
+          type: integer
+          format: int64
+          description: "AG3: Suggested holding period in seconds"
+        risk_tags:
+          type: array
+          items:
+            type: string
+          description: "AG3: Risk classification tags"
+        quality_score:
+          type: number
+          format: double
+          description: "AG3: Signal quality score"
+        decay_factor:
+          type: number
+          format: double
+          description: "AG3: Signal decay factor"
+        regime:
+          type: string
+          description: "AG3: Market regime label"
+        ic_score:
+          type: number
+          format: double
+          description: "AG3: Information coefficient"
+        turnover_cost:
+          type: number
+          format: double
+          description: "AG3: Estimated turnover cost"
+        timestamp:
+          type: string
+          format: date-time
+        type:
+          $ref: '#/components/schemas/SignalType'
+        direction:
+          $ref: '#/components/schemas/SignalDirection'
+        metadata:
+          type: string
+          description: "Additional metadata as JSON string"
+
+    SignalType:
+      type: string
+      enum:
+        - MOMENTUM
+        - MEAN_REVERSION
+        - ARBITRAGE
+        - MICROSTRUCTURE
+        - SENTIMENT
+
+    SignalDirection:
+      type: string
+      enum:
+        - LONG
+        - SHORT
+        - NEUTRAL
+
+    SignalQuality:
+      type: object
+      properties:
+        ic_score:
+          type: number
+          format: double
+        sharpe_ratio:
+          type: number
+          format: double
+        hit_rate:
+          type: number
+          format: double
+        decay_half_life:
+          type: number
+          format: double
+
+    OrderRequest:
+      type: object
+      required:
+        - strategy_id
+        - symbol
+        - side
+        - type
+        - quantity
+      properties:
+        strategy_id:
+          type: string
+        symbol:
+          type: string
+        side:
+          $ref: '#/components/schemas/OrderSide'
+        type:
+          $ref: '#/components/schemas/OrderType'
+        quantity:
+          type: number
+          format: double
+          minimum: 0
+        price:
+          type: number
+          format: double
+          minimum: 0
+        stop_price:
+          type: number
+          format: double
+          minimum: 0
+        venue:
+          type: string
+        execution_params:
+          $ref: '#/components/schemas/ExecutionParams'
+        parent_order_id:
+          type: string
+
+    Order:
+      allOf:
+        - $ref: '#/components/schemas/OrderRequest'
+        - type: object
+          required:
+            - id
+            - status
+            - created_at
+          properties:
+            id:
+              type: string
+              readOnly: true
+            status:
+              $ref: '#/components/schemas/OrderStatus'
+            created_at:
+              type: string
+              format: date-time
+              readOnly: true
+            updated_at:
+              type: string
+              format: date-time
+              readOnly: true
+            child_order_ids:
+              type: array
+              items:
+                type: string
+              readOnly: true
+
+    OrderSide:
+      type: string
+      enum:
+        - BUY
+        - SELL
+
+    OrderType:
+      type: string
+      enum:
+        - MARKET
+        - LIMIT
+        - STOP
+        - STOP_LIMIT
+        - TWAP
+        - VWAP
+        - POV
+        - ADAPTIVE
+
+    OrderStatus:
+      type: string
+      enum:
+        - PENDING
+        - WORKING
+        - PARTIALLY_FILLED
+        - FILLED
+        - CANCELLED
+        - REJECTED
+        - EXPIRED
+
+    ExecutionParams:
+      type: object
+      properties:
+        participation_rate:
+          type: number
+          format: double
+          minimum: 0.0
+          maximum: 1.0
+          description: "Participation rate for algorithmic execution"
+        time_horizon:
+          type: integer
+          format: int64
+          description: "Execution time horizon in seconds"
+        urgency:
+          type: number
+          format: double
+          minimum: 0.0
+          maximum: 1.0
+          description: "Execution urgency level"
+        venue_preference:
+          type: string
+          description: "Preferred venue for execution"
+        max_slippage:
+          type: number
+          format: double
+          description: "Maximum acceptable slippage in basis points"
+        is_aggressive:
+          type: boolean
+          description: "Whether to use aggressive execution"
+        algorithm:
+          $ref: '#/components/schemas/ExecutionAlgorithm'
+
+    ExecutionAlgorithm:
+      type: string
+      enum:
+        - TWAP
+        - VWAP
+        - POV
+        - ADAPTIVE
+
+    ExecutionReport:
+      type: object
+      required:
+        - order_id
+        - execution_id
+        - symbol
+        - side
+        - quantity
+        - price
+        - timestamp
+        - venue
+      properties:
+        order_id:
+          type: string
+        execution_id:
+          type: string
+        symbol:
+          type: string
+        side:
+          $ref: '#/components/schemas/OrderSide'
+        quantity:
+          type: number
+          format: double
+        price:
+          type: number
+          format: double
+        commission:
+          type: number
+          format: double
+        timestamp:
+          type: string
+          format: date-time
+        venue:
+          type: string
+        quality:
+          $ref: '#/components/schemas/ExecutionQuality'
+        liquidity_flag:
+          type: string
+          enum: [MAKER, TAKER]
+        market_price:
+          type: number
+          format: double
+
+    ExecutionQuality:
+      type: object
+      description: "AG3: Execution quality metrics"
+      properties:
+        effective_slippage:
+          type: number
+          format: double
+          description: "Effective slippage in basis points"
+        fill_rate:
+          type: number
+          format: double
+          description: "Order fill rate"
+        participation_deviation:
+          type: number
+          format: double
+          description: "Deviation from target participation rate"
+        cost_basis_points:
+          type: number
+          format: double
+          description: "Total cost in basis points"
+        venue_hit_rate:
+          type: number
+          format: double
+          description: "Venue hit rate"
+        queue_wait_time:
+          type: number
+          format: double
+          description: "Average queue waiting time in milliseconds"
+
+    RiskCheckResult:
+      type: object
+      required:
+        - passed
+        - risk_score
+        - timestamp
+      properties:
+        passed:
+          type: boolean
+        violations:
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskViolation'
+        risk_score:
+          type: number
+          format: double
+        timestamp:
+          type: string
+          format: date-time
+
+    RiskViolation:
+      type: object
+      required:
+        - type
+        - description
+        - severity
+        - threshold
+        - current_value
+      properties:
+        type:
+          $ref: '#/components/schemas/RiskViolationType'
+        description:
+          type: string
+        severity:
+          $ref: '#/components/schemas/RiskSeverity'
+        threshold:
+          type: number
+          format: double
+        current_value:
+          type: number
+          format: double
+
+    RiskViolationType:
+      type: string
+      enum:
+        - POSITION_LIMIT
+        - DRAWDOWN
+        - DAILY_LOSS
+        - VELOCITY
+        - CORRELATION
+        - BLACKLIST
+
+    RiskSeverity:
+      type: string
+      enum:
+        - LOW
+        - MEDIUM
+        - HIGH
+        - CRITICAL
+
+    RiskMetrics:
+      type: object
+      properties:
+        var_95:
+          type: number
+          format: double
+          description: "95% Value at Risk"
+        cvar_95:
+          type: number
+          format: double
+          description: "95% Conditional Value at Risk"
+        max_drawdown:
+          type: number
+          format: double
+          description: "Maximum drawdown"
+        sharpe_ratio:
+          type: number
+          format: double
+          description: "Sharpe ratio"
+        calmar_ratio:
+          type: number
+          format: double
+          description: "Calmar ratio"
+
+    MarketData:
+      type: object
+      required:
+        - symbol
+        - timestamp
+      properties:
+        symbol:
+          type: string
+        bid:
+          type: number
+          format: double
+        ask:
+          type: number
+          format: double
+        last_price:
+          type: number
+          format: double
+        volume:
+          type: number
+          format: double
+        timestamp:
+          type: string
+          format: date-time
+        book_levels:
+          type: array
+          items:
+            $ref: '#/components/schemas/BookLevel'
+        microstructure:
+          $ref: '#/components/schemas/MicrostructureData'
+
+    BookLevel:
+      type: object
+      required:
+        - price
+        - size
+      properties:
+        price:
+          type: number
+          format: double
+        size:
+          type: number
+          format: double
+        order_count:
+          type: integer
+          format: int32
+
+    MicrostructureData:
+      type: object
+      description: "AG3: Microstructure market data"
+      properties:
+        order_book_imbalance:
+          type: number
+          format: double
+          description: "Order book imbalance (OBI)"
+        queue_imbalance:
+          type: number
+          format: double
+          description: "Queue imbalance indicator"
+        flow_toxicity:
+          type: number
+          format: double
+          description: "Flow toxicity measure"
+        effective_spread:
+          type: number
+          format: double
+          description: "Effective bid-ask spread"
+        impact_cost:
+          type: number
+          format: double
+          description: "Estimated market impact cost"
+        trade_cluster_id:
+          type: integer
+          format: int64
+          description: "Trade cluster identifier"
+
+    SignalResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        signal_id:
+          type: string
+        message:
+          type: string
+
+    Error:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    RateLimited:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      in: header
+      name: X-API-Key
+
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - ApiKey: []
+  - BearerAuth: []

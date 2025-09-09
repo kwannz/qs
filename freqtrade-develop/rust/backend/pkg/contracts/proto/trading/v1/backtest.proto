@@ -1,0 +1,30 @@
+syntax = "proto3";
+package trading.v1;
+
+import "trading/v1/common.proto";
+
+message BacktestRequest {
+  string tenant = 1;
+  string strategy_name = 2;
+  string symbol = 3;
+  string start_date = 4; // ISO8601
+  string end_date = 5;   // ISO8601
+  map<string, string> params = 6;
+  string idempotency_key = 7;
+}
+
+message BacktestResult {
+  string id = 1;
+  string status = 2;        // SUCCEEDED/FAILED/RUNNING
+  bytes summary_json = 3;   // 指标与概要
+  string artifact_uri = 4;  // 对象存储路径
+}
+
+service BacktestService {
+  rpc SubmitBacktest(BacktestRequest) returns (JobAck);
+  rpc GetBacktest(JobId) returns (BacktestResult);
+  rpc StreamBacktest(JobId) returns (stream ProgressEvent);
+  rpc CancelBacktest(JobId) returns (JobAck);
+}
+
+

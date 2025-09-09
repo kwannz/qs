@@ -1,0 +1,151 @@
+openapi: 3.1.0
+info:
+  title: Trading API
+  version: v1
+paths:
+  /api/v1/backtests:
+    post:
+      summary: Submit backtest (async)
+      parameters:
+        - in: header
+          name: Idempotency-Key
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BacktestRequest'
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/JobAck' }
+  /api/v1/backtests/{id}:
+    get:
+      summary: Get backtest result or status
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BacktestResult' }
+  /api/v1/backtests/{id}/stream:
+    get:
+      summary: Stream backtest progress (SSE)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            text/event-stream:
+              schema: { type: string }
+  /api/v1/factors/batch:
+    post:
+      summary: Batch compute factors (async)
+      parameters:
+        - in: header
+          name: Idempotency-Key
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FactorBatchRequest'
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/JobAck' }
+  /api/v1/risk/pretrade-check:
+    post:
+      summary: Pretrade risk check
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PretradeRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PretradeDecision' }
+
+components:
+  schemas:
+    JobAck:
+      type: object
+      properties:
+        id: { type: string }
+        accepted_at_ms: { type: integer, format: int64 }
+        estimate_ms: { type: integer, format: int64 }
+    BacktestRequest:
+      type: object
+      required: [tenant, strategy_name, symbol, start_date, end_date]
+      properties:
+        tenant: { type: string }
+        strategy_name: { type: string }
+        symbol: { type: string }
+        start_date: { type: string, format: date-time }
+        end_date: { type: string, format: date-time }
+        params:
+          type: object
+          additionalProperties: { type: string }
+    BacktestResult:
+      type: object
+      properties:
+        id: { type: string }
+        status: { type: string, enum: [SUCCEEDED, FAILED, RUNNING] }
+        summary_json: { type: string, format: byte }
+        artifact_uri: { type: string }
+    FactorBatchRequest:
+      type: object
+      required: [tenant, symbols, timeframe]
+      properties:
+        tenant: { type: string }
+        symbols:
+          type: array
+          items: { type: string }
+        timeframe: { type: string }
+        factors:
+          type: object
+          additionalProperties: { type: string }
+    PretradeRequest:
+      type: object
+      required: [tenant, orders]
+      properties:
+        tenant: { type: string }
+        orders:
+          type: array
+          items:
+            type: object
+            properties:
+              symbol: { type: string }
+              quantity: { type: number }
+              side: { type: string, enum: [BUY, SELL, LONG, SHORT] }
+              price: { type: number }
+    PretradeDecision:
+      type: object
+      properties:
+        allowed: { type: boolean }
+        violations:
+          type: array
+          items: { type: string }
+
+

@@ -1,0 +1,74 @@
+name: Sprint Task
+description: Create a granular sprint task with clear acceptance criteria.
+title: "[Sprint] <Concise task title>"
+labels:
+  - sprint
+body:
+  - type: textarea
+    id: background
+    attributes:
+      label: Background / Context
+      description: Why is this needed? Link related issues/PRDs.
+      placeholder: Describe the problem, impact and intent.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope & Steps
+      description: What to change/do exactly. Break down into steps.
+      placeholder: "- Step 1\n- Step 2\n- Step 3"
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: Measurable pass/fail conditions.
+      placeholder: "- Condition A\n- Condition B\n- Condition C"
+    validations:
+      required: true
+  - type: textarea
+    id: risks
+    attributes:
+      label: Risks & Dependencies
+      description: External factors, blockers, or required sequencing.
+      placeholder: List risks and dependencies.
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - P0
+        - P1
+        - P2
+        - P3
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - api
+        - exchange
+        - data
+        - db
+        - runtime
+        - perf
+        - ci
+        - devops
+        - deps
+        - security
+        - test
+  - type: dropdown
+    id: estimate
+    attributes:
+      label: Estimate
+      options:
+        - XS
+        - S
+        - M
+        - L
+        - XL
+

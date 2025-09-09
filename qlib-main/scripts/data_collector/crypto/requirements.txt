@@ -1,0 +1,6 @@
+ccxt>=4.2.0
+fire
+pandas
+numpy
+loguru
+tqdm

@@ -1,0 +1,27 @@
+syntax = "proto3";
+package trading.v1;
+
+import "trading/v1/common.proto";
+
+message FactorBatchRequest {
+  string tenant = 1;
+  repeated string symbols = 2;
+  string timeframe = 3; // e.g., 1m/5m/1h/1d
+  map<string, string> factors = 4; // name->params json
+  string idempotency_key = 5;
+}
+
+message FactorBatchResult {
+  string id = 1;
+  string status = 2;
+  bytes summary_json = 3;
+  string artifact_uri = 4;
+}
+
+service FactorService {
+  rpc BatchCompute(FactorBatchRequest) returns (JobAck);
+  rpc GetResult(JobId) returns (FactorBatchResult);
+  rpc StreamFactor(JobId) returns (stream ProgressEvent);
+}
+
+

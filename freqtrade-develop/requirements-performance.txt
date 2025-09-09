@@ -1,0 +1,13 @@
+# Performance optimization dependencies for Freqtrade
+# UPDATED: Numba compatibility issue discovered - using pure NumPy approach
+
+# Numba 0.61.2 explicitly rejects numpy ≥2.3, but freqtrade requires numpy 2.3.2
+# Therefore, we're implementing pure NumPy vectorization optimizations instead
+# This maintains production compatibility while still achieving significant performance gains
+
+# Optional Numba support (for future compatibility when numpy 2.4+ support arrives)
+# numba>=0.61.0,<1.0.0; python_version>="3.11" and numpy<"2.3"
+# llvmlite>=0.44.0,<1.0.0; python_version>="3.11" and numpy<"2.3" 
+
+# Additional performance utilities (all compatible with numpy 2.3.2)
+# scipy  # For advanced mathematical functions if needed

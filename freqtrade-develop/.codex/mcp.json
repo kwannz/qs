@@ -1,0 +1,34 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-playwright"],
+      "env": {
+        "PLAYWRIGHT_HEADLESS": "1",
+        "PLAYWRIGHT_BROWSER": "chromium"
+      },
+      "timeoutSeconds": 120,
+      "disabled": false
+    },
+    "playwright_firefox": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-playwright"],
+      "env": {
+        "PLAYWRIGHT_HEADLESS": "1",
+        "PLAYWRIGHT_BROWSER": "firefox"
+      },
+      "timeoutSeconds": 120,
+      "disabled": false
+    },
+    "playwright_webkit": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-playwright"],
+      "env": {
+        "PLAYWRIGHT_HEADLESS": "1",
+        "PLAYWRIGHT_BROWSER": "webkit"
+      },
+      "timeoutSeconds": 120,
+      "disabled": false
+    }
+  }
+}

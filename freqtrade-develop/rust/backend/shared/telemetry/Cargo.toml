@@ -1,0 +1,61 @@
+[package]
+name = "platform-telemetry"
+version = "0.1.0"
+edition = "2021"
+description = "Sprint 1: OpenTelemetry集成库 - 统一遥测数据收集"
+
+[dependencies]
+# Async runtime
+tokio = { workspace = true }
+futures = { workspace = true }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Error handling
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+
+# Logging and tracing
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+# Sprint 1: OpenTelemetry依赖
+opentelemetry = { version = "0.21", features = ["trace", "metrics"] }
+opentelemetry_sdk = { version = "0.21", features = ["rt-tokio", "trace", "metrics"] }
+opentelemetry-otlp = { version = "0.14", default-features = false, features = ["trace", "metrics", "grpc-tonic", "http-proto", "reqwest-client", "reqwest-rustls"] }
+opentelemetry-prometheus = "0.14"
+tracing-opentelemetry = "0.22"
+
+# HTTP追踪集成（禁用默认特性，避免引入带有 native-tls 的客户端栈）
+opentelemetry-http = { version = "0.10", default-features = false }
+tower = { workspace = true }
+tower-http = { version = "0.5", features = ["trace"] }
+axum = { workspace = true }
+bytes = { workspace = true }
+
+# 度量收集
+prometheus = "0.13"
+
+# Utilities
+uuid = { workspace = true }
+chrono = { workspace = true }
+rand = "0.8"
+tokio-stream = { workspace = true }
+
+# HTTP client for health checks
+reqwest = { workspace = true }
+
+# Async traits
+async-trait = { workspace = true }
+
+# Configuration
+platform-config = { path = "../config" }
+
+[features]
+default = ["otlp", "prometheus"]
+otlp = []
+prometheus = []
+jaeger = []
+testing = []

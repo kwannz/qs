@@ -1,0 +1,168 @@
+# 加密货币量化交易平台统一配置
+# Crypto Quantitative Trading Platform Unified Configuration
+
+[platform]
+name = "crypto-quant-platform"
+version = "2.0.0"
+description = "End-to-end crypto quantitative trading platform"
+
+# 服务发现和端口分配
+[services]
+
+# 网关服务 - 统一入口
+[services.gateway]
+host = "0.0.0.0"
+port = 8080
+enabled = true
+description = "Unified API Gateway"
+
+# 分析平台服务 (8000-8009)
+[services.analytics]
+enabled = true
+description = "Analytics and Strategy Generation Platform"
+
+[services.analytics.rust_engine]
+host = "0.0.0.0"
+port = 8000
+description = "Analytics Rust Engine"
+
+[services.analytics.python_api]
+host = "0.0.0.0"
+port = 8001
+description = "Analytics Python API"
+
+[services.analytics.frontend]
+host = "0.0.0.0"
+port = 8002
+description = "Analytics Frontend Dashboard"
+
+[services.analytics.websocket]
+host = "0.0.0.0"
+port = 8003
+description = "Analytics WebSocket Service"
+
+# 执行引擎服务 (8010-8019)
+[services.execution]
+enabled = true
+description = "Trading Execution Engine"
+
+[services.execution.main_engine]
+host = "0.0.0.0"
+port = 8010
+description = "Main Trading Engine"
+
+[services.execution.http_api]
+host = "0.0.0.0"
+port = 8011
+description = "Trading HTTP API"
+
+[services.execution.websocket]
+host = "0.0.0.0"
+port = 8012
+description = "Trading WebSocket Service"
+
+[services.execution.grpc]
+host = "0.0.0.0"
+port = 8013
+description = "Trading gRPC Service"
+
+# 监控服务 (9090-9099)
+[services.monitoring]
+enabled = true
+description = "Monitoring and Metrics"
+
+[services.monitoring.prometheus]
+host = "0.0.0.0"
+port = 9090
+description = "Prometheus Metrics"
+
+[services.monitoring.grafana]
+host = "0.0.0.0"
+port = 9091
+description = "Grafana Dashboard"
+
+[services.monitoring.health_check]
+host = "0.0.0.0"
+port = 9092
+description = "Health Check Service"
+
+# 数据库服务
+[database]
+
+[database.postgresql]
+host = "localhost"
+port = 5432
+database = "crypto_quant_platform"
+username = "trading_user"
+password = "trading_pass"
+max_connections = 20
+connection_timeout = 30
+
+[database.redis]
+host = "localhost"
+port = 6379
+database = 0
+pool_size = 20
+timeout = 5
+
+[database.mongodb]
+host = "localhost"
+port = 27017
+database = "crypto_analytics"
+timeout = 5000
+
+# 消息队列
+[message_queue]
+redis_url = "redis://localhost:6379/1"
+channels = ["strategy_signals", "market_data", "execution_results"]
+
+# 交易所配置
+[exchanges]
+
+[exchanges.binance]
+name = "binance"
+enabled = true
+sandbox = true
+api_key = ""  # 从环境变量获取
+secret_key = ""  # 从环境变量获取
+rest_base_url = "https://testnet.binance.vision"
+websocket_url = "wss://testnet.binance.vision/ws"
+
+[exchanges.okx]
+name = "okx"
+enabled = true
+sandbox = true
+api_key = ""  # 从环境变量获取
+secret_key = ""  # 从环境变量获取
+passphrase = ""  # 从环境变量获取
+rest_base_url = "https://www.okx.com"
+websocket_url = "wss://ws.okx.com:8443/ws/v5/public"
+
+# 风险控制
+[risk_management]
+enabled = true
+max_daily_loss_ratio = 0.05
+max_position_ratio = 0.8
+max_single_order_ratio = 0.1
+max_leverage = 3.0
+
+# 日志配置
+[logging]
+level = "info"
+console_output = true
+file_output = true
+file_path = "logs/platform.log"
+file_rotation = "daily"
+json_format = true
+
+# 安全配置
+[security]
+enable_authentication = true
+enable_authorization = true
+jwt_secret = "platform_jwt_secret_change_in_production"
+cors_allowed_origins = ["http://localhost:3000", "http://localhost:8002"]
+
+# 环境配置
+[environment]
+name = "development"
+debug = true

@@ -1,0 +1,35 @@
+# Build optimization configuration for Rust trading platform
+
+[build]
+target-dir = "target"
+incremental = true
+jobs = 4  # Adjust based on CPU cores
+
+[profile.dev]
+opt-level = 0
+debug = true
+incremental = true
+split-debuginfo = "unpacked"  # Optimized for development
+
+[profile.release]
+opt-level = 3
+lto = "thin"          # Link-time optimization for better performance
+codegen-units = 1     # Better optimization
+strip = true          # Smaller binaries
+panic = "abort"       # Smaller binaries, faster execution
+
+[profile.bench]
+inherits = "release"
+debug = true          # Keep debug info for profiling
+
+[profile.test]
+opt-level = 1         # Slightly optimized test builds
+debug = 2
+
+# Target-specific configurations for trading platform
+[target.x86_64-unknown-linux-gnu]
+linker = "clang"
+rustflags = ["-C", "link-arg=-fuse-ld=lld"]
+
+[target.x86_64-apple-darwin]
+rustflags = ["-C", "link-arg=-Wl,-dead_strip"]

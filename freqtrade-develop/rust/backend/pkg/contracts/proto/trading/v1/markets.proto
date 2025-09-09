@@ -1,0 +1,269 @@
+syntax = "proto3";
+package trading.v1;
+
+import "trading/v1/common.proto";
+import "trading/v1/execution.proto";
+
+// ============ Markets 数据类型 ============
+
+// 交易所信息
+message Exchange {
+  string id = 1;
+  string name = 2;
+  string display_name = 3;
+  bool is_active = 4;
+  repeated string supported_pairs = 5;
+  map<string, string> metadata = 6;
+}
+
+// 交易对查询
+message SymbolSearchRequest {
+  optional string query = 1;        // 搜索关键字
+  optional string exchange = 2;     // 交易所过滤
+  PageRequest page = 3;
+}
+
+// 交易对信息
+message SymbolInfo {
+  string symbol = 1;
+  string base_asset = 2;
+  string quote_asset = 3;
+  string exchange = 4;
+  string display_name = 5;
+  bool is_active = 6;
+  double min_quantity = 7;
+  double max_quantity = 8;
+  double price_precision = 9;
+  double quantity_precision = 10;
+  map<string, string> metadata = 11;
+}
+
+// K线数据请求
+message CandleRequest {
+  string symbol = 1;
+  string timeframe = 2;              // 1m, 5m, 15m, 1h, 4h, 1d, etc.
+  optional int64 start_time_ms = 3;  // 开始时间
+  optional int64 end_time_ms = 4;    // 结束时间
+  optional int32 limit = 5;          // 限制数量，默认500
+  optional string cursor = 6;        // 游标分页
+}
+
+// K线数据
+message Candle {
+  string symbol = 1;
+  string timeframe = 2;
+  int64 open_time_ms = 3;
+  int64 close_time_ms = 4;
+  double open_price = 5;
+  double high_price = 6;
+  double low_price = 7;
+  double close_price = 8;
+  double volume = 9;
+  double quote_volume = 10;         // 成交额
+  int32 trade_count = 11;           // 交易次数
+  double taker_buy_volume = 12;     // 主动买入量
+  double taker_buy_quote_volume = 13; // 主动买入成交额
+}
+
+// K线响应
+message CandleResponse {
+  repeated Candle candles = 1;
+  optional string next_cursor = 2;
+  bool has_more = 3;
+  int32 total_count = 4;
+}
+
+// 订单簿请求
+message OrderBookRequest {
+  string symbol = 1;
+  optional int32 depth = 2;         // 深度，默认20
+}
+
+// 订单簿层级
+message OrderBookLevel {
+  double price = 1;
+  double quantity = 2;
+  int32 order_count = 3;            // 订单数量
+}
+
+// 订单簿
+message OrderBook {
+  string symbol = 1;
+  int64 timestamp_ms = 2;
+  int64 last_update_id = 3;
+  repeated OrderBookLevel bids = 4;  // 买单
+  repeated OrderBookLevel asks = 5;  // 卖单
+}
+
+// 最近成交请求
+message TradeRequest {
+  string symbol = 1;
+  optional int32 limit = 2;         // 限制数量，默认100
+  optional string cursor = 3;       // 游标
+}
+
+// 成交记录
+message Trade {
+  string symbol = 1;
+  string trade_id = 2;
+  int64 timestamp_ms = 3;
+  double price = 4;
+  double quantity = 5;
+  double quote_quantity = 6;
+  string side = 7;                   // BUY/SELL (主动方)
+  bool is_buyer_maker = 8;
+}
+
+// 成交响应
+message TradeResponse {
+  repeated Trade trades = 1;
+  optional string next_cursor = 2;
+  bool has_more = 3;
+}
+
+// 24小时统计请求
+message StatsRequest {
+  optional string symbol = 1;       // 如果为空，返回所有
+}
+
+// 24小时统计
+message SymbolStats {
+  string symbol = 1;
+  int64 timestamp_ms = 2;
+  double price_change = 3;           // 价格变化
+  double price_change_percent = 4;   // 价格变化百分比
+  double high_price = 5;             // 24h最高价
+  double low_price = 6;              // 24h最低价
+  double volume = 7;                 // 24h成交量
+  double quote_volume = 8;           // 24h成交额
+  double open_price = 9;             // 开盘价
+  double close_price = 10;           // 收盘价
+  int32 trade_count = 11;            // 交易次数
+  double weighted_avg_price = 12;    // 加权平均价
+}
+
+// 统计响应
+message StatsResponse {
+  repeated SymbolStats stats = 1;
+}
+
+// 市场数据订阅请求
+message MarketDataSubscription {
+  string channel = 1;                // candles, orderbook, trades
+  string symbol = 2;
+  optional string timeframe = 3;     // for candles
+  optional int32 depth = 4;          // for orderbook
+}
+
+// 实时市场数据
+message MarketDataUpdate {
+  string channel = 1;
+  string symbol = 2;
+  int64 timestamp_ms = 3;
+  oneof data {
+    Candle candle_update = 4;
+    OrderBook orderbook_update = 5;
+    Trade trade_update = 6;
+    SymbolStats stats_update = 7;
+  }
+}
+
+// ============ Markets 服务定义 ============
+
+service MarketDataService {
+  // 交易所和交易对查询
+  rpc ListExchanges(PageRequest) returns (stream Exchange);
+  rpc SearchSymbols(SymbolSearchRequest) returns (stream SymbolInfo);
+  rpc GetSymbolInfo(SymbolInfo) returns (SymbolInfo);
+  
+  // 历史数据查询
+  rpc GetCandles(CandleRequest) returns (CandleResponse);
+  rpc GetOrderBook(OrderBookRequest) returns (OrderBook);
+  rpc GetRecentTrades(TradeRequest) returns (TradeResponse);
+  rpc GetStats(StatsRequest) returns (StatsResponse);
+  
+  // 实时数据流
+  rpc SubscribeMarketData(MarketDataSubscription) returns (stream MarketDataUpdate);
+  rpc SubscribeAllTickers(StatsRequest) returns (stream SymbolStats);
+  
+  // 健康检查
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
+}
+
+// ============ 数据管理服务 (Admin) ============
+
+// 数据导入请求
+message DataImportRequest {
+  string symbol = 1;
+  string timeframe = 2;
+  string data_source = 3;           // binance, coinbase, etc.
+  TimeRange time_range = 4;
+  bool force_overwrite = 5;
+  string idempotency_key = 6;
+}
+
+// 数据回补请求
+message DataBackfillRequest {
+  optional string symbol = 1;       // 如果为空，回补所有
+  optional string timeframe = 2;    // 如果为空，回补所有时间框架
+  optional TimeRange time_range = 3; // 如果为空，自动检测缺口
+  int32 max_concurrent_jobs = 4;    // 最大并发作业数
+  string idempotency_key = 5;
+}
+
+// 数据缺口信息
+message DataGap {
+  string symbol = 1;
+  string timeframe = 2;
+  int64 gap_start_ms = 3;
+  int64 gap_end_ms = 4;
+  int64 detected_at_ms = 5;
+  string status = 6;                // DETECTED, BACKFILLING, RESOLVED
+}
+
+// 缺口查询请求
+message DataGapQuery {
+  optional string symbol = 1;
+  optional string timeframe = 2;
+  optional string status = 3;       // DETECTED, BACKFILLING, RESOLVED
+  PageRequest page = 4;
+}
+
+// 缺口响应
+message DataGapResponse {
+  repeated DataGap gaps = 1;
+  PageResponse page = 2;
+}
+
+// 数据管理服务
+service DataManagementService {
+  // 数据导入和回补
+  rpc ImportData(DataImportRequest) returns (JobAck);
+  rpc BackfillData(DataBackfillRequest) returns (JobAck);
+  rpc GetDataJob(JobId) returns (JobResponse);
+  
+  // 缺口管理
+  rpc ListDataGaps(DataGapQuery) returns (DataGapResponse);
+  rpc ResolveGap(DataGap) returns (JobAck);
+  
+  // 数据质量检查
+  rpc ValidateDataQuality(DataImportRequest) returns (JobResponse);
+  
+  // 健康检查
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
+}
+
+// 健康检查消息重用execution.proto中的定义
+
+// Job响应（扩展common.proto）
+message JobResponse {
+  string id = 1;
+  string status = 2;               // queued, running, succeeded, failed, canceled
+  double progress = 3;             // 0.0 - 1.0
+  int64 submitted_at_ms = 4;
+  optional int64 started_at_ms = 5;
+  optional int64 finished_at_ms = 6;
+  optional string result = 7;      // JSON格式的结果
+  optional string error = 8;       // 错误信息
+  map<string, string> metadata = 9; // 额外元数据
+}

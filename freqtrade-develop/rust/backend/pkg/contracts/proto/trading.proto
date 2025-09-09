@@ -1,0 +1,612 @@
+syntax = "proto3";
+
+package trading;
+
+import "google/protobuf/timestamp.proto";
+
+// 统一信号结构 - AG3标准
+message Signal {
+    string id = 1;
+    string symbol = 2;
+    string strategy_name = 3;
+    double strength = 4;
+    double confidence = 5;           // AG3: 置信度
+    optional uint64 half_life = 6;   // AG3: 信号半衰期（秒）
+    optional uint64 suggested_holding = 7; // AG3: 建议持有期（秒）
+    repeated string risk_tags = 8;   // AG3: 风险标签
+    optional double quality_score = 9; // AG3: 信号质量评分
+    optional double decay_factor = 10; // AG3: 衰减因子
+    optional string regime = 11;     // AG3: 体制标签
+    optional double ic_score = 12;   // AG3: 信息系数
+    optional double turnover_cost = 13; // AG3: 预估换手成本
+    google.protobuf.Timestamp timestamp = 14;
+    SignalType type = 15;
+    SignalDirection direction = 16;
+    optional string metadata = 17;
+}
+
+enum SignalType {
+    SIGNAL_TYPE_UNSPECIFIED = 0;
+    SIGNAL_TYPE_MOMENTUM = 1;
+    SIGNAL_TYPE_MEAN_REVERSION = 2;
+    SIGNAL_TYPE_ARBITRAGE = 3;
+    SIGNAL_TYPE_MICROSTRUCTURE = 4;
+    SIGNAL_TYPE_SENTIMENT = 5;
+}
+
+enum SignalDirection {
+    SIGNAL_DIRECTION_UNSPECIFIED = 0;
+    SIGNAL_DIRECTION_LONG = 1;
+    SIGNAL_DIRECTION_SHORT = 2;
+    SIGNAL_DIRECTION_NEUTRAL = 3;
+}
+
+// 订单结构
+message Order {
+    string id = 1;
+    string strategy_id = 2;
+    string symbol = 3;
+    OrderSide side = 4;
+    OrderType type = 5;
+    double quantity = 6;
+    optional double price = 7;
+    optional double stop_price = 8;
+    OrderStatus status = 9;
+    google.protobuf.Timestamp created_at = 10;
+    optional google.protobuf.Timestamp updated_at = 11;
+    optional string venue = 12;
+    ExecutionParams execution_params = 13;
+    optional string parent_order_id = 14;
+    repeated string child_order_ids = 15;
+}
+
+enum OrderSide {
+    ORDER_SIDE_UNSPECIFIED = 0;
+    ORDER_SIDE_BUY = 1;
+    ORDER_SIDE_SELL = 2;
+}
+
+enum OrderType {
+    ORDER_TYPE_UNSPECIFIED = 0;
+    ORDER_TYPE_MARKET = 1;
+    ORDER_TYPE_LIMIT = 2;
+    ORDER_TYPE_STOP = 3;
+    ORDER_TYPE_STOP_LIMIT = 4;
+    ORDER_TYPE_TWAP = 5;
+    ORDER_TYPE_VWAP = 6;
+    ORDER_TYPE_POV = 7;           // AG3: 参与率算法
+    ORDER_TYPE_ADAPTIVE = 8;      // AG3: 自适应执行
+}
+
+enum OrderStatus {
+    ORDER_STATUS_UNSPECIFIED = 0;
+    ORDER_STATUS_PENDING = 1;
+    ORDER_STATUS_WORKING = 2;
+    ORDER_STATUS_PARTIALLY_FILLED = 3;
+    ORDER_STATUS_FILLED = 4;
+    ORDER_STATUS_CANCELLED = 5;
+    ORDER_STATUS_REJECTED = 6;
+    ORDER_STATUS_EXPIRED = 7;
+}
+
+// AG3执行参数
+message ExecutionParams {
+    optional double participation_rate = 1;  // 参与率
+    optional uint64 time_horizon = 2;        // 执行时间窗口（秒）
+    optional double urgency = 3;             // 紧急程度
+    optional string venue_preference = 4;    // 场所偏好
+    optional double max_slippage = 5;        // 最大滑点
+    optional bool is_aggressive = 6;         // 是否激进
+    ExecutionAlgorithm algorithm = 7;
+}
+
+enum ExecutionAlgorithm {
+    EXECUTION_ALGORITHM_UNSPECIFIED = 0;
+    EXECUTION_ALGORITHM_TWAP = 1;
+    EXECUTION_ALGORITHM_VWAP = 2;
+    EXECUTION_ALGORITHM_POV = 3;
+    EXECUTION_ALGORITHM_ADAPTIVE = 4;
+}
+
+// 交易报告结构
+message ExecutionReport {
+    string order_id = 1;
+    string execution_id = 2;
+    string symbol = 3;
+    OrderSide side = 4;
+    double quantity = 5;
+    double price = 6;
+    double commission = 7;
+    google.protobuf.Timestamp timestamp = 8;
+    string venue = 9;
+    ExecutionQuality quality = 10;      // AG3: 执行质量指标
+    optional string liquidity_flag = 11;
+    optional double market_price = 12;
+}
+
+// AG3执行质量指标
+message ExecutionQuality {
+    double effective_slippage = 1;      // 有效滑点
+    double fill_rate = 2;               // 成交率
+    double participation_deviation = 3;  // 参与率偏差
+    double cost_basis_points = 4;       // 成本基点
+    double venue_hit_rate = 5;          // 场所命中率
+    optional double queue_wait_time = 6; // 队列等待时间
+}
+
+// 风控结果
+message RiskCheckResult {
+    bool passed = 1;
+    repeated RiskViolation violations = 2;
+    double risk_score = 3;
+    google.protobuf.Timestamp timestamp = 4;
+}
+
+message RiskViolation {
+    RiskViolationType type = 1;
+    string description = 2;
+    RiskSeverity severity = 3;
+    double threshold = 4;
+    double current_value = 5;
+}
+
+enum RiskViolationType {
+    RISK_VIOLATION_TYPE_UNSPECIFIED = 0;
+    RISK_VIOLATION_TYPE_POSITION_LIMIT = 1;
+    RISK_VIOLATION_TYPE_DRAWDOWN = 2;
+    RISK_VIOLATION_TYPE_DAILY_LOSS = 3;
+    RISK_VIOLATION_TYPE_VELOCITY = 4;
+    RISK_VIOLATION_TYPE_CORRELATION = 5;
+    RISK_VIOLATION_TYPE_BLACKLIST = 6;
+}
+
+enum RiskSeverity {
+    RISK_SEVERITY_UNSPECIFIED = 0;
+    RISK_SEVERITY_LOW = 1;
+    RISK_SEVERITY_MEDIUM = 2;
+    RISK_SEVERITY_HIGH = 3;
+    RISK_SEVERITY_CRITICAL = 4;
+}
+
+// 市场数据
+message MarketData {
+    string symbol = 1;
+    double bid = 2;
+    double ask = 3;
+    double last_price = 4;
+    double volume = 5;
+    google.protobuf.Timestamp timestamp = 6;
+    repeated BookLevel book_levels = 7;
+    MicrostructureData microstructure = 8; // AG3: 微结构数据
+}
+
+message BookLevel {
+    double price = 1;
+    double size = 2;
+    uint32 order_count = 3;
+}
+
+// AG3微结构数据
+message MicrostructureData {
+    double order_book_imbalance = 1;    // OBI
+    double queue_imbalance = 2;         // 队列不平衡
+    double flow_toxicity = 3;           // 流动性毒性
+    double effective_spread = 4;        // 有效价差
+    double impact_cost = 5;             // 冲击成本
+    uint64 trade_cluster_id = 6;        // 交易簇ID
+}
+
+// 服务定义
+service TradingService {
+    rpc SubmitOrder(Order) returns (ExecutionReport);
+    rpc CancelOrder(CancelOrderRequest) returns (CancelOrderResponse);
+    rpc GetOrderStatus(GetOrderStatusRequest) returns (Order);
+    rpc StreamExecutions(StreamExecutionsRequest) returns (stream ExecutionReport);
+}
+
+service SignalService {
+    rpc PublishSignal(Signal) returns (PublishSignalResponse);
+    rpc SubscribeSignals(SubscribeSignalsRequest) returns (stream Signal);
+    rpc GetSignalQuality(GetSignalQualityRequest) returns (SignalQuality);
+}
+
+service RiskService {
+    rpc CheckRisk(RiskCheckRequest) returns (RiskCheckResult);
+    rpc GetRiskMetrics(GetRiskMetricsRequest) returns (RiskMetrics);
+    rpc StreamRiskAlerts(StreamRiskAlertsRequest) returns (stream RiskAlert);
+}
+
+service MarketDataService {
+    rpc SubscribeMarketData(SubscribeMarketDataRequest) returns (stream MarketData);
+    rpc GetHistoricalData(GetHistoricalDataRequest) returns (HistoricalDataResponse);
+}
+
+// AG3 新增服务
+service TCAService {
+    rpc AnalyzeExecution(AnalyzeExecutionRequest) returns (TCAAnalysis);
+    rpc GetTCAReport(GetTCAReportRequest) returns (TCAReport);
+    rpc StreamTCAMetrics(StreamTCAMetricsRequest) returns (stream TCAAnalysis);
+}
+
+service RegimeService {
+    rpc GetCurrentRegime(GetCurrentRegimeRequest) returns (RegimeDetection);
+    rpc SubscribeRegimeChanges(SubscribeRegimeChangesRequest) returns (stream RegimeDetection);
+    rpc UpdateRegimeModel(UpdateRegimeModelRequest) returns (UpdateRegimeModelResponse);
+}
+
+service BanditService {
+    rpc CreateExperiment(CreateExperimentRequest) returns (CreateExperimentResponse);
+    rpc PullArm(PullArmRequest) returns (PullArmResponse);
+    rpc UpdateReward(UpdateRewardRequest) returns (UpdateRewardResponse);
+    rpc GetExperimentStatus(GetExperimentStatusRequest) returns (BanditExperiment);
+}
+
+service FactorService {
+    rpc ComputeFactor(ComputeFactorRequest) returns (ComputeFactorResponse);
+    rpc BatchComputeFactors(BatchComputeFactorsRequest) returns (BatchComputeFactorsResponse);
+    rpc GetFactorCache(GetFactorCacheRequest) returns (FactorCacheEntry);
+    rpc InvalidateCache(InvalidateCacheRequest) returns (InvalidateCacheResponse);
+}
+
+// 请求/响应消息
+message CancelOrderRequest {
+    string order_id = 1;
+    optional string reason = 2;
+}
+
+message CancelOrderResponse {
+    bool success = 1;
+    optional string error_message = 2;
+}
+
+message GetOrderStatusRequest {
+    string order_id = 1;
+}
+
+message StreamExecutionsRequest {
+    optional string strategy_id = 1;
+    optional string symbol = 2;
+}
+
+message PublishSignalResponse {
+    bool success = 1;
+    optional string error_message = 2;
+}
+
+message SubscribeSignalsRequest {
+    repeated string strategies = 1;
+    repeated string symbols = 2;
+}
+
+message GetSignalQualityRequest {
+    string signal_id = 1;
+}
+
+message SignalQuality {
+    double ic_score = 1;
+    double sharpe_ratio = 2;
+    double hit_rate = 3;
+    double decay_half_life = 4;
+}
+
+message RiskCheckRequest {
+    Order order = 1;
+    optional string portfolio_id = 2;
+}
+
+message GetRiskMetricsRequest {
+    optional string portfolio_id = 1;
+    optional string strategy_id = 2;
+}
+
+message RiskMetrics {
+    double var_95 = 1;
+    double cvar_95 = 2;
+    double max_drawdown = 3;
+    double sharpe_ratio = 4;
+    double calmar_ratio = 5;
+}
+
+message StreamRiskAlertsRequest {
+    repeated RiskSeverity severities = 1;
+}
+
+message RiskAlert {
+    RiskViolationType type = 1;
+    string description = 2;
+    RiskSeverity severity = 3;
+    google.protobuf.Timestamp timestamp = 4;
+}
+
+message SubscribeMarketDataRequest {
+    repeated string symbols = 1;
+    bool include_book = 2;
+    bool include_microstructure = 3;
+}
+
+message GetHistoricalDataRequest {
+    string symbol = 1;
+    google.protobuf.Timestamp start_time = 2;
+    google.protobuf.Timestamp end_time = 3;
+    string granularity = 4;
+}
+
+message HistoricalDataResponse {
+    repeated MarketData data = 1;
+}
+
+// AG3 TCA服务请求/响应
+message TCARequest {
+    string execution_id = 1;
+    string benchmark_type = 2;
+    optional google.protobuf.Timestamp start_time = 3;
+    optional google.protobuf.Timestamp end_time = 4;
+}
+
+message AnalyzeExecutionRequest {
+    string execution_id = 1;
+    string benchmark_type = 2;
+    optional google.protobuf.Timestamp start_time = 3;
+    optional google.protobuf.Timestamp end_time = 4;
+}
+
+message GetTCAReportRequest {
+    string strategy_id = 1;
+    string symbol = 2;
+    google.protobuf.Timestamp start_date = 3;
+    google.protobuf.Timestamp end_date = 4;
+}
+
+message TCAResponse {
+    TCAReport report = 1;
+    bool success = 2;
+    string error_message = 3;
+}
+
+message TCAReport {
+    repeated TCAAnalysis analyses = 1;
+    TCAMetrics aggregate_metrics = 2;
+    string report_id = 3;
+    google.protobuf.Timestamp generated_at = 4;
+}
+
+message StreamTCAMetricsRequest {
+    repeated string symbols = 1;
+    repeated string strategy_ids = 2;
+}
+
+// 体制检测服务请求/响应
+message GetCurrentRegimeRequest {
+    string symbol = 1;
+    optional string model_version = 2;
+}
+
+message SubscribeRegimeChangesRequest {
+    repeated string symbols = 1;
+    double min_confidence = 2;
+}
+
+message UpdateRegimeModelRequest {
+    string symbol = 1;
+    RegimeParameters new_parameters = 2;
+    string model_version = 3;
+}
+
+message UpdateRegimeModelResponse {
+    bool success = 1;
+    optional string error_message = 2;
+    string updated_model_version = 3;
+}
+
+// 多臂老虎机服务请求/响应
+message CreateExperimentRequest {
+    string experiment_name = 1;
+    string context_key = 2;
+    repeated string arm_descriptions = 3;
+    BanditStrategy strategy = 4;
+    map<string, double> initial_parameters = 5;
+}
+
+message CreateExperimentResponse {
+    bool success = 1;
+    string experiment_id = 2;
+    optional string error_message = 3;
+}
+
+message PullArmRequest {
+    string experiment_id = 1;
+    map<string, double> context_features = 2;
+}
+
+message PullArmResponse {
+    string selected_arm_id = 1;
+    double confidence = 2;
+    map<string, double> arm_parameters = 3;
+}
+
+message UpdateRewardRequest {
+    string experiment_id = 1;
+    string arm_id = 2;
+    double reward = 3;
+    map<string, double> context_features = 4;
+}
+
+message UpdateRewardResponse {
+    bool success = 1;
+    optional string error_message = 2;
+    ExperimentMetrics updated_metrics = 3;
+}
+
+message GetExperimentStatusRequest {
+    string experiment_id = 1;
+}
+
+// 因子服务请求/响应
+message ComputeFactorRequest {
+    string factor_name = 1;
+    string symbol = 2;
+    uint64 window_size = 3;
+    map<string, double> parameters = 4;
+    optional bool use_cache = 5;
+}
+
+message ComputeFactorResponse {
+    repeated double values = 1;
+    repeated google.protobuf.Timestamp timestamps = 2;
+    bool from_cache = 3;
+    string computation_id = 4;
+}
+
+message BatchComputeFactorsRequest {
+    repeated ComputeFactorRequest requests = 1;
+    bool parallel_execution = 2;
+}
+
+message BatchComputeFactorsResponse {
+    repeated ComputeFactorResponse responses = 1;
+    uint32 cache_hits = 2;
+    uint32 cache_misses = 3;
+    double total_computation_time_ms = 4;
+}
+
+message GetFactorCacheRequest {
+    FactorCacheKey key = 1;
+}
+
+message InvalidateCacheRequest {
+    optional string symbol = 1;
+    optional string factor_name = 2;
+    bool invalidate_all = 3;
+}
+
+message InvalidateCacheResponse {
+    bool success = 1;
+    uint32 invalidated_entries = 2;
+    optional string error_message = 3;
+}
+
+// AG3 TCA (交易成本分析) 结构
+message TCAAnalysis {
+    string execution_id = 1;
+    string symbol = 2;
+    TCAMetrics gross_metrics = 3;     // 毛成本指标
+    TCAMetrics net_metrics = 4;       // 净成本指标
+    CostBreakdown cost_breakdown = 5;
+    google.protobuf.Timestamp analysis_time = 6;
+    string benchmark_type = 7;        // TWAP/VWAP/Arrival等
+}
+
+message TCAMetrics {
+    double implementation_shortfall = 1;  // 执行缺口
+    double market_impact = 2;            // 市场冲击成本
+    double timing_cost = 3;              // 时机成本
+    double spread_cost = 4;              // 价差成本
+    double opportunity_cost = 5;         // 机会成本
+    double effective_slippage_bps = 6;   // 有效滑点(基点)
+}
+
+message CostBreakdown {
+    double commission = 1;               // 佣金
+    double fees = 2;                    // 交易费
+    double market_impact_permanent = 3;  // 永久冲击
+    double market_impact_temporary = 4;  // 临时冲击
+    double bid_ask_spread = 5;          // 买卖价差
+    double timing_alpha = 6;            // 时机Alpha
+}
+
+// AG3 体制检测结构
+message RegimeDetection {
+    string symbol = 1;
+    RegimeType current_regime = 2;
+    double regime_confidence = 3;       // 体制置信度
+    uint64 regime_duration = 4;         // 当前体制持续时间(秒)
+    repeated RegimeTransition history = 5;
+    RegimeParameters parameters = 6;
+    google.protobuf.Timestamp updated_at = 7;
+}
+
+enum RegimeType {
+    REGIME_TYPE_UNSPECIFIED = 0;
+    REGIME_TYPE_TRENDING_UP = 1;        // 上升趋势
+    REGIME_TYPE_TRENDING_DOWN = 2;      // 下降趋势
+    REGIME_TYPE_MEAN_REVERTING = 3;     // 均值回归
+    REGIME_TYPE_HIGH_VOLATILITY = 4;    // 高波动
+    REGIME_TYPE_LOW_VOLATILITY = 5;     // 低波动
+    REGIME_TYPE_CRISIS = 6;             // 危机状态
+}
+
+message RegimeTransition {
+    RegimeType from_regime = 1;
+    RegimeType to_regime = 2;
+    google.protobuf.Timestamp transition_time = 3;
+    double transition_probability = 4;
+}
+
+message RegimeParameters {
+    double volatility = 1;              // 波动率
+    double correlation = 2;             // 相关性
+    double momentum_strength = 3;       // 动量强度
+    double mean_reversion_strength = 4; // 均值回归强度
+    double liquidity_factor = 5;        // 流动性因子
+}
+
+// AG3 多臂老虎机结构
+message BanditExperiment {
+    string experiment_id = 1;
+    string context_key = 2;             // 上下文键值
+    repeated BanditArm arms = 3;
+    BanditStrategy strategy = 4;
+    ExperimentMetrics metrics = 5;
+    google.protobuf.Timestamp created_at = 6;
+}
+
+message RegimeDetectionRequest {
+    repeated double price_data = 1;
+    repeated double volume_data = 2;
+    string detection_method = 3; // "hmm", "kmeans"
+    int32 num_regimes = 4;
+    optional google.protobuf.Timestamp start_time = 5;
+    optional google.protobuf.Timestamp end_time = 6;
+}
+
+message BanditArm {
+    string arm_id = 1;
+    string description = 2;
+    uint32 pulls = 3;                   // 拉取次数
+    double reward_sum = 4;              // 累计奖励
+    double confidence_bound = 5;        // 置信上界
+    map<string, double> parameters = 6; // 臂参数
+}
+
+enum BanditStrategy {
+    BANDIT_STRATEGY_UNSPECIFIED = 0;
+    BANDIT_STRATEGY_UCB = 1;            // Upper Confidence Bound
+    BANDIT_STRATEGY_THOMPSON = 2;       // Thompson Sampling
+    BANDIT_STRATEGY_EPSILON_GREEDY = 3; // ε-贪心
+    BANDIT_STRATEGY_CONTEXTUAL = 4;     // 上下文老虎机
+}
+
+message ExperimentMetrics {
+    double cumulative_regret = 1;       // 累计遗憾
+    double conversion_rate = 2;         // 转换率
+    double confidence_interval = 3;     // 置信区间
+    uint32 total_trials = 4;           // 总试验次数
+}
+
+// AG3 因子缓存结构
+message FactorCacheKey {
+    string symbol = 1;
+    uint64 window_size = 2;             // 时间窗口大小
+    string params_hash = 3;             // 参数哈希
+    string factor_name = 4;
+}
+
+message FactorCacheEntry {
+    FactorCacheKey key = 1;
+    repeated double values = 2;         // 因子值序列
+    repeated google.protobuf.Timestamp timestamps = 3;
+    double hit_rate = 4;                // 缓存命中率
+    google.protobuf.Timestamp last_updated = 5;
+    uint64 access_count = 6;            // 访问次数
+    bool is_incremental = 7;            // 是否支持增量更新
+}

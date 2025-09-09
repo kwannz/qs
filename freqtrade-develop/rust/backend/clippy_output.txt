@@ -1,0 +1,720 @@
+warning: variables can be used directly in the `format!` string
+   --> shared/config/src/lib.rs:180:42
+    |
+180 |             .add_source(File::with_name(&format!("shared/config/{}", env)).required(false))
+    |                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+    = note: `-W clippy::uninlined-format-args` implied by `-W clippy::all`
+    = help: to override `-W clippy::all` add `#[allow(clippy::uninlined_format_args)]`
+help: change this to
+    |
+180 -             .add_source(File::with_name(&format!("shared/config/{}", env)).required(false))
+180 +             .add_source(File::with_name(&format!("shared/config/{env}")).required(false))
+    |
+
+warning: variables can be used directly in the `format!` string
+   --> shared/config/src/lib.rs:181:42
+    |
+181 |             .add_source(File::with_name(&format!("config/{}", env)).required(false));
+    |                                          ^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+    |
+181 -             .add_source(File::with_name(&format!("config/{}", env)).required(false));
+181 +             .add_source(File::with_name(&format!("config/{env}")).required(false));
+    |
+
+warning: `platform-config` (lib) generated 2 warnings (run `cargo clippy --fix --lib -p platform-config` to apply 2 suggestions)
+warning: variables can be used directly in the `format!` string
+  --> shared/utils/src/crypto.rs:42:47
+   |
+42 |             CryptoError::InvalidInput(msg) => write!(f, "Invalid input: {}", msg),
+   |                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+   = note: `-W clippy::uninlined-format-args` implied by `-W clippy::all`
+   = help: to override `-W clippy::all` add `#[allow(clippy::uninlined_format_args)]`
+help: change this to
+   |
+42 -             CryptoError::InvalidInput(msg) => write!(f, "Invalid input: {}", msg),
+42 +             CryptoError::InvalidInput(msg) => write!(f, "Invalid input: {msg}"),
+   |
+
+warning: variables can be used directly in the `format!` string
+  --> shared/utils/src/crypto.rs:43:48
+   |
+43 |             CryptoError::HashingFailed(msg) => write!(f, "Hashing failed: {}", msg),
+   |                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+   |
+43 -             CryptoError::HashingFailed(msg) => write!(f, "Hashing failed: {}", msg),
+43 +             CryptoError::HashingFailed(msg) => write!(f, "Hashing failed: {msg}"),
+   |
+
+warning: variables can be used directly in the `format!` string
+  --> shared/utils/src/validation.rs:84:17
+   |
+84 |                 write!(f, "Input too short: {} characters, requires at least {}", actual, required)
+   |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+   |
+84 -                 write!(f, "Input too short: {} characters, requires at least {}", actual, required)
+84 +                 write!(f, "Input too short: {actual} characters, requires at least {required}")
+   |
+
+warning: variables can be used directly in the `format!` string
+  --> shared/utils/src/validation.rs:87:17
+   |
+87 |                 write!(f, "Input too long: {} characters, maximum allowed is {}", actual, limit)
+   |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+   |
+87 -                 write!(f, "Input too long: {} characters, maximum allowed is {}", actual, limit)
+87 +                 write!(f, "Input too long: {actual} characters, maximum allowed is {limit}")
+   |
+
+warning: variables can be used directly in the `format!` string
+  --> shared/utils/src/validation.rs:90:17
+   |
+90 |                 write!(f, "Value {} is out of range [{}, {}]", value, min, max)
+   |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+   |
+90 -                 write!(f, "Value {} is out of range [{}, {}]", value, min, max)
+90 +                 write!(f, "Value {value} is out of range [{min}, {max}]")
+   |
+
+warning: variables can be used directly in the `format!` string
+  --> shared/utils/src/validation.rs:93:17
+   |
+93 |                 write!(f, "Invalid format for {}: expected {}", field, expected)
+   |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+   |
+93 -                 write!(f, "Invalid format for {}: expected {}", field, expected)
+93 +                 write!(f, "Invalid format for {field}: expected {expected}")
+   |
+
+warning: variables can be used directly in the `format!` string
+ --> shared/utils/src/error.rs:9:9
+  |
+9 |         format!("Error in {}: {}", context, error)
+  |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+  |
+9 -         format!("Error in {}: {}", context, error)
+9 +         format!("Error in {context}: {error}")
+  |
+
+warning: variables can be used directly in the `format!` string
+  --> shared/utils/src/error.rs:77:17
+   |
+77 |                 write!(f, "Configuration error: {}", message)
+   |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+   |
+77 -                 write!(f, "Configuration error: {}", message)
+77 +                 write!(f, "Configuration error: {message}")
+   |
+
+warning: variables can be used directly in the `format!` string
+  --> shared/utils/src/error.rs:81:21
+   |
+81 |                     write!(f, "Network error ({}): {}", code, message)
+   |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+   |
+81 -                     write!(f, "Network error ({}): {}", code, message)
+81 +                     write!(f, "Network error ({code}): {message}")
+   |
+
+warning: variables can be used directly in the `format!` string
+  --> shared/utils/src/error.rs:83:21
+   |
+83 |                     write!(f, "Network error: {}", message)
+   |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+   |
+83 -                     write!(f, "Network error: {}", message)
+83 +                     write!(f, "Network error: {message}")
+   |
+
+warning: variables can be used directly in the `format!` string
+  --> shared/utils/src/error.rs:88:21
+   |
+88 |                     write!(f, "Database error: {} (query: {})", message, query)
+   |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+   |
+88 -                     write!(f, "Database error: {} (query: {})", message, query)
+88 +                     write!(f, "Database error: {message} (query: {query})")
+   |
+
+warning: variables can be used directly in the `format!` string
+  --> shared/utils/src/error.rs:90:21
+   |
+90 |                     write!(f, "Database error: {}", message)
+   |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+   |
+90 -                     write!(f, "Database error: {}", message)
+90 +                     write!(f, "Database error: {message}")
+   |
+
+warning: variables can be used directly in the `format!` string
+  --> shared/utils/src/error.rs:94:17
+   |
+94 |                 write!(f, "Authentication error: {}", message)
+   |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+   |
+94 -                 write!(f, "Authentication error: {}", message)
+94 +                 write!(f, "Authentication error: {message}")
+   |
+
+warning: variables can be used directly in the `format!` string
+  --> shared/utils/src/error.rs:97:17
+   |
+97 |                 write!(f, "Authorization error for '{}': {}", resource, message)
+   |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+   |
+97 -                 write!(f, "Authorization error for '{}': {}", resource, message)
+97 +                 write!(f, "Authorization error for '{resource}': {message}")
+   |
+
+warning: variables can be used directly in the `format!` string
+   --> shared/utils/src/error.rs:100:17
+    |
+100 |                 write!(f, "Validation error for '{}': {}", field, message)
+    |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+    |
+100 -                 write!(f, "Validation error for '{}': {}", field, message)
+100 +                 write!(f, "Validation error for '{field}': {message}")
+    |
+
+warning: variables can be used directly in the `format!` string
+   --> shared/utils/src/error.rs:104:21
+    |
+104 |                     write!(f, "Internal error: {} (caused by: {})", message, source)
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+    |
+104 -                     write!(f, "Internal error: {} (caused by: {})", message, source)
+104 +                     write!(f, "Internal error: {message} (caused by: {source})")
+    |
+
+warning: variables can be used directly in the `format!` string
+   --> shared/utils/src/error.rs:106:21
+    |
+106 |                     write!(f, "Internal error: {}", message)
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+    |
+106 -                     write!(f, "Internal error: {}", message)
+106 +                     write!(f, "Internal error: {message}")
+    |
+
+warning: variables can be used directly in the `format!` string
+  --> shared/utils/src/monitoring.rs:57:19
+   |
+57 |             help: format!("Counter metric: {}", name),
+   |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+   |
+57 -             help: format!("Counter metric: {}", name),
+57 +             help: format!("Counter metric: {name}"),
+   |
+
+warning: variables can be used directly in the `format!` string
+  --> shared/utils/src/monitoring.rs:84:19
+   |
+84 |             help: format!("Gauge metric: {}", name),
+   |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+   |
+84 -             help: format!("Gauge metric: {}", name),
+84 +             help: format!("Gauge metric: {name}"),
+   |
+
+warning: variables can be used directly in the `format!` string
+   --> shared/utils/src/monitoring.rs:111:19
+    |
+111 |             help: format!("Histogram metric: {}", name),
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+    |
+111 -             help: format!("Histogram metric: {}", name),
+111 +             help: format!("Histogram metric: {name}"),
+    |
+
+warning: variables can be used directly in the `format!` string
+   --> shared/utils/src/monitoring.rs:142:39
+    |
+142 |                         .map(|(k, v)| format!("{}=\"{}\"", k, v))
+    |                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+    |
+142 -                         .map(|(k, v)| format!("{}=\"{}\"", k, v))
+142 +                         .map(|(k, v)| format!("{k}=\"{v}\""))
+    |
+
+warning: casting `u64` to `f64` causes a loss of precision (`u64` is 64 bits wide, but `f64`'s mantissa is only 52 bits wide)
+   --> shared/utils/src/monitoring.rs:202:13
+    |
+202 |             u64::MAX as f64
+    |             ^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#cast_precision_loss
+    = note: `-W clippy::cast-precision-loss` implied by `-W clippy::pedantic`
+    = help: to override `-W clippy::pedantic` add `#[allow(clippy::cast_precision_loss)]`
+
+warning: casting `u128` to `f64` causes a loss of precision (`u128` is 128 bits wide, but `f64`'s mantissa is only 52 bits wide)
+   --> shared/utils/src/monitoring.rs:204:13
+    |
+204 |             duration.as_millis() as f64
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#cast_precision_loss
+
+warning: you should consider adding a `Default` implementation for `HealthMonitor`
+   --> shared/utils/src/monitoring.rs:244:5
+    |
+244 | /     pub fn new() -> Self {
+245 | |         Self {
+246 | |             checks: Arc::new(RwLock::new(HashMap::new())),
+247 | |         }
+248 | |     }
+    | |_____^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#new_without_default
+    = note: `-W clippy::new-without-default` implied by `-W clippy::all`
+    = help: to override `-W clippy::all` add `#[allow(clippy::new_without_default)]`
+help: try adding this
+    |
+243 + impl Default for HealthMonitor {
+244 +     fn default() -> Self {
+245 +         Self::new()
+246 +     }
+247 + }
+    |
+
+warning: variables can be used directly in the `format!` string
+   --> shared/utils/src/logging.rs:103:9
+    |
+103 |         println!("{}", log_entry);
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+    |
+103 -         println!("{}", log_entry);
+103 +         println!("{log_entry}");
+    |
+
+warning: variables can be used directly in the `format!` string
+   --> shared/utils/src/logging.rs:115:27
+    |
+115 |         let field_value = format!("{:?}", value);
+    |                           ^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+    |
+115 -         let field_value = format!("{:?}", value);
+115 +         let field_value = format!("{value:?}");
+    |
+
+warning: variables can be used directly in the `format!` string
+   --> shared/utils/src/logging.rs:178:14
+    |
+178 |             &format!("Trade signal generated: {} {} {}", symbol, signal_type, strength),
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+    |
+178 -             &format!("Trade signal generated: {} {} {}", symbol, signal_type, strength),
+178 +             &format!("Trade signal generated: {symbol} {signal_type} {strength}"),
+    |
+
+warning: variables can be used directly in the `format!` string
+   --> shared/utils/src/logging.rs:182:9
+    |
+182 |         println!("{}", log_entry);
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+    |
+182 -         println!("{}", log_entry);
+182 +         println!("{log_entry}");
+    |
+
+warning: variables can be used directly in the `format!` string
+   --> shared/utils/src/logging.rs:200:14
+    |
+200 |             &format!("Order placed: {} {} {} @ {:?}", symbol, side, quantity, price),
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+    |
+200 -             &format!("Order placed: {} {} {} @ {:?}", symbol, side, quantity, price),
+200 +             &format!("Order placed: {symbol} {side} {quantity} @ {price:?}"),
+    |
+
+warning: variables can be used directly in the `format!` string
+   --> shared/utils/src/logging.rs:204:9
+    |
+204 |         println!("{}", log_entry);
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+    |
+204 -         println!("{}", log_entry);
+204 +         println!("{log_entry}");
+    |
+
+warning: variables can be used directly in the `format!` string
+   --> shared/utils/src/logging.rs:219:14
+    |
+219 |             &format!("Order executed: {} {} @ {}", symbol, quantity, price),
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+    |
+219 -             &format!("Order executed: {} {} @ {}", symbol, quantity, price),
+219 +             &format!("Order executed: {symbol} {quantity} @ {price}"),
+    |
+
+warning: variables can be used directly in the `format!` string
+   --> shared/utils/src/logging.rs:223:9
+    |
+223 |         println!("{}", log_entry);
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+    |
+223 -         println!("{}", log_entry);
+223 +         println!("{log_entry}");
+    |
+
+warning: variables can be used directly in the `format!` string
+   --> shared/utils/src/logging.rs:237:14
+    |
+237 |             &format!("Risk event: {} - {}", event_type, description),
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+    |
+237 -             &format!("Risk event: {} - {}", event_type, description),
+237 +             &format!("Risk event: {event_type} - {description}"),
+    |
+
+warning: variables can be used directly in the `format!` string
+   --> shared/utils/src/logging.rs:241:9
+    |
+241 |         println!("{}", log_entry);
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+    |
+241 -         println!("{}", log_entry);
+241 +         println!("{log_entry}");
+    |
+
+warning: variables can be used directly in the `format!` string
+   --> shared/utils/src/logging.rs:257:14
+    |
+257 |             &format!("System error in {}: {}", component, error),
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+    |
+257 -             &format!("System error in {}: {}", component, error),
+257 +             &format!("System error in {component}: {error}"),
+    |
+
+warning: variables can be used directly in the `format!` string
+   --> shared/utils/src/logging.rs:261:9
+    |
+261 |         println!("{}", log_entry);
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+    |
+261 -         println!("{}", log_entry);
+261 +         println!("{log_entry}");
+    |
+
+warning: variables can be used directly in the `format!` string
+   --> shared/utils/src/logging.rs:294:17
+    |
+294 |                 println!("{}", log);
+    |                 ^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+    |
+294 -                 println!("{}", log);
+294 +                 println!("{log}");
+    |
+
+warning: `platform-utils` (lib) generated 37 warnings (run `cargo clippy --fix --lib -p platform-utils` to apply 35 suggestions)
+    Checking logging v0.1.0 (/Users/zhaoleon/Documents/rust/backend/shared/logging)
+    Checking platform_security v0.1.0 (/Users/zhaoleon/Documents/rust/backend/shared/security)
+warning: variables can be used directly in the `format!` string
+   --> shared/cache/tests/integration_tests.rs:370:47
+    |
+370 |             let test_data = TestData::new(i, &format!("concurrent_{}", i), i as f64);
+    |                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+    = note: `-W clippy::uninlined-format-args` implied by `-W clippy::all`
+    = help: to override `-W clippy::all` add `#[allow(clippy::uninlined_format_args)]`
+help: change this to
+    |
+370 -             let test_data = TestData::new(i, &format!("concurrent_{}", i), i as f64);
+370 +             let test_data = TestData::new(i, &format!("concurrent_{i}"), i as f64);
+    |
+
+warning: variables can be used directly in the `format!` string
+   --> shared/cache/tests/integration_tests.rs:371:23
+    |
+371 |             let key = format!("concurrent:test:{}", i);
+    |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+    |
+371 -             let key = format!("concurrent:test:{}", i);
+371 +             let key = format!("concurrent:test:{i}");
+    |
+
+warning: variables can be used directly in the `format!` string
+   --> shared/cache/tests/integration_tests.rs:416:43
+    |
+416 |         let test_data = TestData::new(i, &format!("pressure_{}", i), i as f64);
+    |                                           ^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+    |
+416 -         let test_data = TestData::new(i, &format!("pressure_{}", i), i as f64);
+416 +         let test_data = TestData::new(i, &format!("pressure_{i}"), i as f64);
+    |
+
+warning: variables can be used directly in the `format!` string
+   --> shared/cache/tests/integration_tests.rs:417:19
+    |
+417 |         let key = format!("pressure:test:{}", i);
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+    |
+417 -         let key = format!("pressure:test:{}", i);
+417 +         let key = format!("pressure:test:{i}");
+    |
+
+warning: variables can be used directly in the `format!` string
+   --> shared/cache/tests/integration_tests.rs:428:19
+    |
+428 |         let key = format!("pressure:test:{}", i);
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+    |
+428 -         let key = format!("pressure:test:{}", i);
+428 +         let key = format!("pressure:test:{i}");
+    |
+
+warning: variables can be used directly in the `format!` string
+   --> shared/cache/tests/integration_tests.rs:473:48
+    |
+473 |         let test_data = TestData::new(i + 20, &format!("flush_{}", i), (i + 20) as f64);
+    |                                                ^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+    |
+473 -         let test_data = TestData::new(i + 20, &format!("flush_{}", i), (i + 20) as f64);
+473 +         let test_data = TestData::new(i + 20, &format!("flush_{i}"), (i + 20) as f64);
+    |
+
+warning: variables can be used directly in the `format!` string
+   --> shared/cache/tests/integration_tests.rs:474:19
+    |
+474 |         let key = format!("flush:test:{}", i);
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+    |
+474 -         let key = format!("flush:test:{}", i);
+474 +         let key = format!("flush:test:{i}");
+    |
+
+warning: variables can be used directly in the `format!` string
+   --> shared/cache/tests/integration_tests.rs:480:19
+    |
+480 |         let key = format!("flush:test:{}", i);
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+    |
+480 -         let key = format!("flush:test:{}", i);
+480 +         let key = format!("flush:test:{i}");
+    |
+
+warning: variables can be used directly in the `format!` string
+   --> shared/cache/tests/integration_tests.rs:489:19
+    |
+489 |         let key = format!("flush:test:{}", i);
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args
+help: change this to
+    |
+489 -         let key = format!("flush:test:{}", i);
+489 +         let key = format!("flush:test:{i}");
+    |
+
+    Checking platform-analytics v0.1.0 (/Users/zhaoleon/Documents/rust/backend/shared/analytics)
+warning: `cache` (test "integration_tests") generated 9 warnings (run `cargo clippy --fix --test "integration_tests"` to apply 9 suggestions)
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `openssl`
+   --> shared/security/src/certificates.rs:496:13
+    |
+496 |         use openssl::pkey::PKey;
+    |             ^^^^^^^ use of unresolved module or unlinked crate `openssl`
+    |
+    = help: if you wanted to use a crate named `openssl`, use `cargo add openssl` to add it to your `Cargo.toml`
+
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `openssl`
+   --> shared/security/src/certificates.rs:497:13
+    |
+497 |         use openssl::rsa::Rsa;
+    |             ^^^^^^^ use of unresolved module or unlinked crate `openssl`
+    |
+    = help: if you wanted to use a crate named `openssl`, use `cargo add openssl` to add it to your `Cargo.toml`
+
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `openssl`
+   --> shared/security/src/certificates.rs:498:13
+    |
+498 |         use openssl::x509::{X509NameBuilder, X509ReqBuilder};
+    |             ^^^^^^^ use of unresolved module or unlinked crate `openssl`
+    |
+    = help: if you wanted to use a crate named `openssl`, use `cargo add openssl` to add it to your `Cargo.toml`
+
+error: `SQLX_OFFLINE=true` but there is no cached data for this query, run `cargo sqlx prepare` to update the query cache or unset `SQLX_OFFLINE`
+   --> shared/logging/src/audit.rs:363:9
+    |
+363 | /         sqlx::query!(
+364 | |             r#"
+365 | |             INSERT INTO audit_logs (
+366 | |                 id, timestamp, trace_id, user_id, action, resource, result, 
+...   |
+381 | |             entry.severity
+382 | |         )
+    | |_________^
+    |
+    = note: this error originates in the macro `$crate::sqlx_macros::expand_query` which comes from the expansion of the macro `sqlx::query` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `openssl`
+   --> shared/security/src/certificates.rs:509:37
+    |
+509 |         req_builder.sign(&key_pair, openssl::hash::MessageDigest::sha256())?;
+    |                                     ^^^^^^^ use of unresolved module or unlinked crate `openssl`
+    |
+    = help: if you wanted to use a crate named `openssl`, use `cargo add openssl` to add it to your `Cargo.toml`
+
+error[E0412]: cannot find type `Arc` in this scope
+   --> shared/logging/src/audit.rs:303:18
+    |
+303 |     pool: Option<Arc<PgPool>>,
+    |                  ^^^ not found in this scope
+    |
+help: consider importing this struct
+    |
+3   + use std::sync::Arc;
+    |
+
+error[E0412]: cannot find type `Arc` in this scope
+   --> shared/logging/src/audit.rs:309:42
+    |
+309 |     pub fn with_database(mut self, pool: Arc<PgPool>) -> Self {
+    |                                          ^^^ not found in this scope
+    |
+help: consider importing this struct
+    |
+3   + use std::sync::Arc;
+    |
+
+warning: unused imports: `counter::Counter`, `family::Family`, `gauge::Gauge`, and `histogram::Histogram`
+  --> shared/logging/src/metrics.rs:12:15
+   |
+12 |     metrics::{counter::Counter, histogram::Histogram, gauge::Gauge, family::Family},
+   |               ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^  ^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` on by default
+
+For more information about this error, try `rustc --explain E0433`.
+error: could not compile `platform_security` (lib) due to 4 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `platform_security` (lib test) due to 4 previous errors
+For more information about this error, try `rustc --explain E0412`.
+warning: `logging` (lib) generated 1 warning
+error: could not compile `logging` (lib) due to 3 previous errors; 1 warning emitted

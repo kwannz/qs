@@ -1,0 +1,20 @@
+# User-specific Historical DB profile (local, not for commit)
+
+HDB_CONFIG := user_data/config.json
+HDB_DATADIR := "/Users/zhaoleon/Downloads/freqtrade-develop/historical data"
+
+# Commonly used pairs / timeframes / range
+HDB_PAIRS := BTC/USDT ETH/USDT
+HDB_TFS := 5m 1h
+HDB_TIMERANGE := 20240101-20240701
+
+# Parallel scan jobs
+HDB_JOBS := 4
+
+# Default strategy for backtests
+HDB_STRATEGY := SampleStrategy
+HDB_REPORT_OUT := user_data/backtest_results/report.csv
+HDB_REPORT_FORMAT := csv
+
+# Python interpreter
+PYTHON := python

@@ -1,0 +1,70 @@
+# System Analysis Report（系统分析报告）
+
+## Overview（概览）
+- Project: Crypto trading system (Python 3.11+) — 项目类型：加密货币量化交易系统（Python 3.11+）。
+- Capabilities: Multi-exchange, strategy engine, backtest/opt, risk/protections, RPC/Web, data tooling — 核心能力：多交易所、策略引擎、回测/优化、风控与保护、RPC/Web、数据工具链。
+- Maturity: Solid CI across OS, lint/type/test pipelines, docs and packaging — 工程成熟度：多平台 CI、静态检查与测试流水线、文档与打包完善。
+
+## System Functions（系统功能）
+- Trade execution with entries/exits, stop-loss, trailing, on-exchange stops — 交易执行：入场/出场、止损、追踪止损、所内止损等。
+- Data pipeline for OHLCV/trades, conversion, analysis, reports — 数据处理：历史数据下载、转换、分析与报表。
+- Strategy framework with protections and position sizing — 策略框架：信号、风控保护、资金管理。
+- RPC integrations (Telegram/Discord/Webhook) and Web UI (FastAPI/Uvicorn) — RPC 集成与基于 FastAPI 的 Web UI。
+
+## Architecture & Modules（架构与模块）
+- CLI/Commands: `freqtrade/commands` — CLI 与子命令（交易、回测、优化、数据、WebServer）。
+- Exchange/Trading: `freqtrade/exchange`, `freqtrade/persistence` — 交易所抽象与持久化。
+- Data/Analysis: `freqtrade/data` — 历史数据、转换器、并行分析工具。
+- RPC/Web: `freqtrade/rpc/api_server` — FastAPI/uvicorn 的 API 与 UI。
+
+## Run & Develop（运行与开发）
+- Quick setup: `./setup.sh -i` — 快速安装与创建 `.venv`、freqUI、pre-commit。
+- Dev install: `python3.11 -m venv .venv && source .venv/bin/activate && pip install -e .[dev]` — 开发环境安装。
+- Useful: `pytest`, `ruff check .`, `ruff format .`, `mypy freqtrade`, `freqtrade --help` — 常用测试/检查命令。
+
+## Web API & Security（Web API 与安全）
+- API/WS: `freqtrade/rpc/api_server` + websockets; external message consumer — 提供 REST/WS 与外部消息消费。
+- Security advice: AuthZ/AuthN, CORS scoping, rate limiting, no secrets in VCS — 鉴权/权限、CORS 范围、速率限制、严禁泄露密钥。
+
+## Quality Assurance（质量保障）
+- Lint/format: Ruff (pyflakes/pycodestyle/bugbear/pyupgrade/isort), `ruff format` (Black-style) — 统一风格与静态检查。
+- Types: mypy (mccabe 12; tuned ignores) — 类型检查（按目录粒度配置）。
+- Tests: pytest + xdist + asyncio; CI on all OS; docs build; packaging — 并行与异步测试，CI 全覆盖。
+
+## Module Risk Register（模块风险清单）
+- Exchange integration — 交易所集成
+  - Risk: Rate limits, network partitions, inconsistent market metadata/precision — 风险：限频、网络分区、交易对精度/最小额不一致。
+  - Impact: Order rejects, partial fills, precision errors — 影响：拒单、部分成交、精度误差。
+  - Mitigation: Centralized precision checks, backoff/retry, ccxt version pinning — 缓解：精度校验、退避重试、固定 ccxt 版本。
+- Strategy engine — 策略引擎
+  - Risk: Look-ahead bias, time alignment, clock skew — 风险：前视偏差、时间对齐、时钟偏移。
+  - Mitigation: Strict resampling, verify candle boundaries, time-freezing in tests — 缓解：严格重采样、边界校验、时间冻结测试。
+- Backtesting/Optimization — 回测与优化
+  - Risk: Overfitting, data leakage, unrealistic fee/slippage — 风险：过拟合、数据泄漏、手续费/滑点不真实。
+  - Mitigation: Walk-forward, OOS validation, configurable fees/slippage — 缓解：滚动验证、样本外校验、可配置费用与滑点。
+- Data pipeline — 数据链路
+  - Risk: Gaps/duplication in OHLCV/trades, timezone issues — 风险：缺口/重复K线、时区问题。
+  - Mitigation: Gap detection, de-duplication, TZ-normalization — 缓解：缺口检测、去重、时区规范化。
+- RPC/API server — RPC 与 API 服务
+  - Risk: Auth bypass, CORS misconfig, WS resource leaks/DoS — 风险：鉴权绕过、CORS 错配、WebSocket 资源泄漏/DoS。
+  - Mitigation: Token-based auth, least-privilege, CORS allowlist, rate-limit, WS heartbeat/limits — 缓解：令牌鉴权、最小权限、CORS 白名单、限流、心跳与连接上限。
+- Persistence/DB — 持久化/数据库
+  - Risk: Migration drift, query performance, data corruption — 风险：迁移漂移、查询性能、数据损坏。
+  - Mitigation: Alembic-style migrations, indexed queries, backups — 缓解：显式迁移、索引优化、备份策略。
+- Scheduler/Concurrency — 调度与并发
+  - Risk: Race conditions, deadlocks, blocking I/O in event loop — 风险：竞态、死锁、事件循环阻塞。
+  - Mitigation: Async-first patterns, bounded thread pools, timeouts/circuit breakers — 缓解：优先异步、受限线程池、超时与熔断。
+- Config/Secrets — 配置与密钥
+  - Risk: Secret leakage in VCS/logs — 风险：密钥在仓库/日志泄露。
+  - Mitigation: `user_data/` gitignored, schema validation, secret scanners in CI — 缓解：忽略用户目录、架构校验、CI 秘密扫描。
+- Client/UI build — 客户端与构建
+  - Risk: Supply-chain via npm/pnpm, outdated bundles — 风险：前端依赖供应链、构建产物过期。
+  - Mitigation: Lockfiles, SRI, periodic updates — 缓解：锁定依赖、SRI 校验、定期升级。
+- Docker/Deployment — 部署与容器
+  - Risk: Image drift, CVEs, runtime misconfig — 风险：镜像漂移、漏洞、运行时配置不当。
+  - Mitigation: CI builds, vulnerability scans, minimal base images — 缓解：CI 构建与扫描、最小化镜像。
+
+## Next Steps（后续步骤）
+- Local smoke: requires Python 3.11+; then run `ruff check .`, `mypy freqtrade`, `pytest -n auto` — 本地烟囱检查需 3.11+，升级后执行上述命令。
+- Harden API defaults (auth/rate-limit/CORS), add secret scanning (e.g., Gitleaks) — 加固 API 默认配置并在 CI 增加密钥扫描。
+- Add coverage threshold and stricter mypy gradually — 引入覆盖率阈值并逐步收紧类型检查。

@@ -1,0 +1,54 @@
+[package]
+name = "platform_resilience"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Async runtime
+tokio = { workspace = true }
+futures = { workspace = true }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Error handling
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+
+# Logging
+tracing = { workspace = true }
+
+# Utilities
+uuid = { workspace = true }
+chrono = { workspace = true }
+
+# Circuit breaker and resilience patterns  
+tower = "0.4"
+tower-timeout = "0.3"
+tower-retry = "0.3"
+tower-limit = "0.3"
+
+# Async traits
+async-trait = { workspace = true }
+
+# HTTP client
+reqwest = { workspace = true }
+
+# Database (for health checks)
+sqlx = { workspace = true }
+redis = { workspace = true, features = ["cluster-async", "tokio-comp"] }
+
+# Random number generation
+fastrand = "2.0"
+rand = "0.8"
+
+# Sprint 1: NATS for outbox publisher  
+async-nats = "0.33"
+
+# Configuration
+platform-config = { path = "../config" }
+
+[features]
+default = []
+testing = []

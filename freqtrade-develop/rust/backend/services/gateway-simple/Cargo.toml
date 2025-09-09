@@ -1,0 +1,37 @@
+[package]
+name = "gateway-simple"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "gateway-simple"
+path = "src/main.rs"
+
+[dependencies]
+tokio = { workspace = true, features = ["rt-multi-thread", "macros", "time", "net", "signal"] }
+axum = { workspace = true }
+tower = { workspace = true, features = ["limit"] }
+tower-http = { workspace = true, features = ["cors", "trace", "timeout", "limit"] }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true, features = ["env-filter"] }
+anyhow = { workspace = true }
+uuid = { workspace = true, features = ["v4", "serde"] }
+chrono = { workspace = true, features = ["serde"] }
+thiserror = { workspace = true }
+reqwest = { workspace = true }
+futures = { workspace = true }
+async-nats = { workspace = true }
+prometheus = { workspace = true }
+once_cell = { workspace = true }
+
+# Configuration
+toml = { workspace = true }
+
+# Shared dependencies
+platform-types = { path = "../../shared/types" }
+platform-telemetry = { path = "../../shared/telemetry" }
+
+[dev-dependencies]
+tokio-test = { workspace = true }

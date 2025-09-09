@@ -1,0 +1,56 @@
+[package]
+name = "platform_security"
+version = "0.1.0"
+edition = "2021"
+
+[lints]
+workspace = true
+
+[dependencies]
+# Security & Crypto (using rustls instead of openssl)
+jsonwebtoken = { workspace = true }
+argon2 = "0.5"
+ring = "0.17"
+rustls = "0.22"
+tokio-rustls = "0.25"
+openssl = { version = "0.10", optional = true }
+
+# Async runtime
+tokio = { workspace = true }
+futures = { workspace = true }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Database
+redis = { workspace = true }
+sqlx = { workspace = true }
+
+# Utilities
+uuid = { workspace = true }
+chrono = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+tempfile = "3"
+
+# Logging
+tracing = { workspace = true }
+
+# Configuration
+platform-config = { path = "../config" }
+platform-types = { path = "../types" }
+
+# Async traits
+async-trait = { workspace = true }
+
+# Base32 encoding for TOTP  
+base32 = { workspace = true }
+
+# Hex encoding
+hex = "0.4"
+
+[features]
+default = []
+openssl = ["dep:openssl"]
+testing = []

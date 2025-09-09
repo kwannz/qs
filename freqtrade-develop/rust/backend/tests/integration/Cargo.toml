@@ -1,0 +1,57 @@
+[package]
+name = "integration-tests"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tokio = { workspace = true, features = ["full"] }
+reqwest = { workspace = true, features = ["json"] }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+uuid = { workspace = true }
+chrono = { workspace = true, features = ["serde"] }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+sqlx = { workspace = true }
+futures = { workspace = true }
+futures-util = { workspace = true }
+tokio-tungstenite = { workspace = true }
+rand = "0.8"
+
+# Test framework
+tokio-test = "0.4"
+assert-json-diff = "2.0"
+criterion = { version = "0.5", features = ["html_reports"] }
+mockall = "0.12"
+wiremock = "0.5"
+
+# Performance testing
+flamegraph = "0.6"
+pprof = { version = "0.12", features = ["flamegraph", "protobuf"] }
+
+# Integration testing specific
+testcontainers = "0.15"
+tempfile = "3.0"
+async-trait = "0.1"
+
+# Shared dependencies
+rust_decimal = { workspace = true }
+rust_decimal_macros = { workspace = true }
+
+[[bin]]
+name = "sprint11_integration_tests"
+path = "src/main.rs"
+
+# Benchmark tests
+[[bench]]
+name = "algorithm_performance"
+harness = false
+
+[[bench]]
+name = "market_data_throughput"
+harness = false
+
+[[bench]]
+name = "monitoring_latency"
+harness = false

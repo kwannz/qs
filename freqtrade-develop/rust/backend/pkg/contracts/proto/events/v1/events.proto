@@ -1,0 +1,265 @@
+syntax = "proto3";
+
+package events.v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/any.proto";
+
+// Base Event definition for all event types
+message BaseEvent {
+  string event_id = 1;
+  string event_type = 2;
+  google.protobuf.Timestamp timestamp = 3;
+  string source_service = 4;
+  google.protobuf.Any payload = 5;
+}
+
+// Market Data Events
+message MarketDataEvent {
+  oneof event {
+    PriceUpdateEvent price_update = 1;
+    OrderBookUpdateEvent orderbook_update = 2;
+    KlineUpdateEvent kline_update = 3;
+    TradeUpdateEvent trade_update = 4;
+  }
+}
+
+message PriceUpdateEvent {
+  string event_id = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  string exchange = 3;
+  string symbol = 4;
+  double price = 5;
+  double volume = 6;
+}
+
+message OrderBookUpdateEvent {
+  string event_id = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  string exchange = 3;
+  string symbol = 4;
+  repeated PriceLevel bids = 5;
+  repeated PriceLevel asks = 6;
+}
+
+message PriceLevel {
+  double price = 1;
+  double quantity = 2;
+}
+
+message KlineUpdateEvent {
+  string event_id = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  string exchange = 3;
+  string symbol = 4;
+  string interval = 5;
+  double open = 6;
+  double high = 7;
+  double low = 8;
+  double close = 9;
+  double volume = 10;
+}
+
+message TradeUpdateEvent {
+  string event_id = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  string exchange = 3;
+  string symbol = 4;
+  double price = 5;
+  double quantity = 6;
+  string side = 7; // "buy" or "sell"
+}
+
+// Trading Events
+message TradingEvent {
+  oneof event {
+    StrategySignalEvent strategy_signal = 1;
+    OrderEvent order_event = 2;
+    PositionUpdateEvent position_update = 3;
+    RiskEvent risk_event = 4;
+  }
+}
+
+message StrategySignalEvent {
+  string event_id = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  string strategy_id = 3;
+  SignalType signal_type = 4;
+  string symbol = 5;
+  double price = 6;
+  double quantity = 7;
+  double confidence = 8;
+}
+
+enum SignalType {
+  SIGNAL_TYPE_UNKNOWN = 0;
+  SIGNAL_TYPE_BUY = 1;
+  SIGNAL_TYPE_SELL = 2;
+  SIGNAL_TYPE_HOLD = 3;
+}
+
+message OrderEvent {
+  string event_id = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  string order_id = 3;
+  string strategy_id = 4;
+  string symbol = 5;
+  OrderSide side = 6;
+  EventOrderStatus status = 7;
+  double price = 8;
+  double quantity = 9;
+  double filled_quantity = 10;
+}
+
+enum OrderSide {
+  ORDER_SIDE_UNKNOWN = 0;
+  ORDER_SIDE_BUY = 1;
+  ORDER_SIDE_SELL = 2;
+}
+
+enum EventOrderStatus {
+  EVENT_ORDER_STATUS_UNKNOWN = 0;
+  EVENT_ORDER_STATUS_PENDING = 1;
+  EVENT_ORDER_STATUS_PARTIALLY_FILLED = 2;
+  EVENT_ORDER_STATUS_FILLED = 3;
+  EVENT_ORDER_STATUS_CANCELED = 4;
+  EVENT_ORDER_STATUS_REJECTED = 5;
+}
+
+message PositionUpdateEvent {
+  string event_id = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  string strategy_id = 3;
+  string symbol = 4;
+  double quantity = 5;
+  double average_price = 6;
+  double unrealized_pnl = 7;
+  double realized_pnl = 8;
+}
+
+message RiskEvent {
+  string event_id = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  RiskType risk_type = 3;
+  RiskSeverity severity = 4;
+  string strategy_id = 5;
+  string symbol = 6;
+  string message = 7;
+  google.protobuf.Any metadata = 8;
+}
+
+enum RiskType {
+  RISK_TYPE_UNKNOWN = 0;
+  RISK_TYPE_POSITION_SIZE = 1;
+  RISK_TYPE_DRAWDOWN = 2;
+  RISK_TYPE_LEVERAGE = 3;
+  RISK_TYPE_CORRELATION = 4;
+  RISK_TYPE_LIQUIDITY = 5;
+}
+
+enum RiskSeverity {
+  RISK_SEVERITY_UNKNOWN = 0;
+  RISK_SEVERITY_LOW = 1;
+  RISK_SEVERITY_MEDIUM = 2;
+  RISK_SEVERITY_HIGH = 3;
+  RISK_SEVERITY_CRITICAL = 4;
+}
+
+// System Events
+message SystemEvent {
+  oneof event {
+    ServiceHealthEvent service_health = 1;
+    PerformanceMetricsEvent performance_metrics = 2;
+    UserSessionEvent user_session = 3;
+    ConfigChangeEvent config_change = 4;
+  }
+}
+
+message ServiceHealthEvent {
+  string event_id = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  string service_name = 3;
+  HealthStatus status = 4;
+  uint64 latency_ms = 5;
+  double error_rate = 6;
+}
+
+enum HealthStatus {
+  HEALTH_STATUS_UNKNOWN = 0;
+  HEALTH_STATUS_HEALTHY = 1;
+  HEALTH_STATUS_DEGRADED = 2;
+  HEALTH_STATUS_UNHEALTHY = 3;
+}
+
+message PerformanceMetricsEvent {
+  string event_id = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  string metric_name = 3;
+  double value = 4;
+  string unit = 5;
+  map<string, string> tags = 6;
+}
+
+message UserSessionEvent {
+  string event_id = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  string session_id = 3;
+  string user_id = 4;
+  SessionAction action = 5;
+}
+
+enum SessionAction {
+  SESSION_ACTION_UNKNOWN = 0;
+  SESSION_ACTION_LOGIN = 1;
+  SESSION_ACTION_LOGOUT = 2;
+  SESSION_ACTION_TIMEOUT = 3;
+}
+
+message ConfigChangeEvent {
+  string event_id = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  string config_key = 3;
+  string old_value = 4;
+  string new_value = 5;
+  string changed_by = 6;
+}
+
+// Event Streaming Service
+service EventService {
+  // Publish a single event
+  rpc PublishEvent(PublishEventRequest) returns (PublishEventResponse);
+  
+  // Subscribe to events
+  rpc SubscribeEvents(SubscribeEventsRequest) returns (stream BaseEvent);
+  
+  // Get event history
+  rpc GetEventHistory(GetEventHistoryRequest) returns (GetEventHistoryResponse);
+}
+
+message PublishEventRequest {
+  BaseEvent event = 1;
+}
+
+message PublishEventResponse {
+  bool success = 1;
+  string error_message = 2;
+}
+
+message SubscribeEventsRequest {
+  repeated string event_types = 1;
+  map<string, string> filters = 2;
+}
+
+message GetEventHistoryRequest {
+  repeated string event_types = 1;
+  google.protobuf.Timestamp start_time = 2;
+  google.protobuf.Timestamp end_time = 3;
+  int32 limit = 4;
+  string cursor = 5;
+}
+
+message GetEventHistoryResponse {
+  repeated BaseEvent events = 1;
+  string next_cursor = 2;
+  bool has_more = 3;
+}

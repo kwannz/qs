@@ -1,0 +1,54 @@
+[package]
+name = "platform-risk-management"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Async runtime
+tokio = { workspace = true }
+futures = { workspace = true }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Error handling
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+
+# Logging and tracing
+tracing = { workspace = true }
+
+# Database
+sqlx = { workspace = true, features = ["rust_decimal"] }
+redis = { workspace = true }
+
+# Utilities
+uuid = { workspace = true }
+chrono = { workspace = true }
+
+# Numeric computations
+rust_decimal = { workspace = true, features = ["serde-with-str"] }
+
+# Cryptography for report integrity
+sha2 = "0.10"
+base64 = { workspace = true }
+
+# Configuration
+platform-config = { path = "../config" }
+# platform-audit = { path = "../audit" }  # DELETED in Sprint 1
+
+# HTTP client for regulatory reporting
+reqwest = { workspace = true }
+
+# Background task scheduling
+cron = "0.12"
+
+# Real-time data processing
+crossbeam-channel = { workspace = true }
+
+[features]
+default = ["real_time", "regulatory_reporting"]
+real_time = []
+regulatory_reporting = []
+stress_testing = []

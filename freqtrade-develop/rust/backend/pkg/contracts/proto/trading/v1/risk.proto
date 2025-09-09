@@ -1,0 +1,27 @@
+syntax = "proto3";
+package trading.v1;
+
+message PretradeOrder {
+  string symbol = 1;
+  double quantity = 2;
+  string side = 3; // BUY/SELL/LONG/SHORT
+  double price = 4; // optional
+}
+
+message PretradeRequest {
+  string tenant = 1;
+  repeated PretradeOrder orders = 2;
+  string strategy_id = 3;
+  string idempotency_key = 4; // Sprint 1 requirement
+}
+
+message PretradeDecision {
+  bool allowed = 1;
+  repeated string violations = 2;
+}
+
+service RiskService {
+  rpc PretradeCheck(PretradeRequest) returns (PretradeDecision);
+}
+
+

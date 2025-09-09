@@ -1,0 +1,105 @@
+# 多阶段构建 Dockerfile - Rust 交易平台后端
+# 优化生产环境部署
+
+# ==================== 构建阶段 ====================
+FROM rust:1.75-slim as builder
+
+# 安装系统依赖
+RUN apt-get update && apt-get install -y \
+    pkg-config \
+    libssl-dev \
+    libpq-dev \
+    ca-certificates \
+    build-essential \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# 设置工作目录
+WORKDIR /app
+
+# 复制 Cargo 配置文件
+COPY Cargo.toml Cargo.lock ./
+
+# 复制所有源代码
+COPY services ./services
+COPY shared ./shared
+
+# 设置构建环境变量
+ENV SQLX_OFFLINE=true
+ENV CARGO_NET_GIT_FETCH_WITH_CLI=true
+ENV RUST_BACKTRACE=1
+
+# 预构建依赖 (缓存优化)
+RUN mkdir -p /tmp/deps && \
+    cd /tmp/deps && \
+    cargo init --name dummy && \
+    echo '[dependencies]' >> Cargo.toml && \
+    echo 'gateway-service = { path = "/app/services/gateway" }' >> Cargo.toml && \
+    cargo build --release && \
+    rm -rf /tmp/deps
+
+# 构建应用程序
+RUN cargo build --release --bin gateway-service
+
+# 验证构建产物
+RUN ls -la target/release/ && \
+    file target/release/gateway-service && \
+    ldd target/release/gateway-service
+
+# ==================== 运行时阶段 ====================
+FROM debian:bookworm-slim as runtime
+
+# 安装运行时依赖
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    libssl3 \
+    libpq5 \
+    curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# 创建应用用户和目录
+RUN groupadd -r trading && \
+    useradd -r -g trading -d /app -s /sbin/nologin trading && \
+    mkdir -p /app/logs /app/config /app/data && \
+    chown -R trading:trading /app
+
+# 设置工作目录
+WORKDIR /app
+
+# 从构建阶段复制二进制文件
+COPY --from=builder /app/target/release/gateway-service /usr/local/bin/gateway-service
+RUN chmod +x /usr/local/bin/gateway-service
+
+# 创建配置目录
+RUN mkdir -p ./config ./migrations
+
+# 复制迁移文件（如果存在）
+COPY migrations/ ./migrations/ || true
+
+# 创建健康检查脚本
+RUN echo '#!/bin/bash\ncurl -f http://localhost:8080/health || exit 1' > /usr/local/bin/health-check
+RUN chmod +x /usr/local/bin/health-check
+
+# 设置环境变量
+ENV RUST_LOG=info \
+    GATEWAY_HOST=0.0.0.0 \
+    GATEWAY_PORT=8080 \
+    LOG_DIR=/app/logs \
+    CONFIG_DIR=/app/config \
+    SQLX_OFFLINE=true \
+    SANDBOX_TRADING=1 \
+    DISABLE_AUTH=1
+
+# 切换到非 root 用户
+USER trading
+
+# 暴露端口
+EXPOSE 8080
+
+# 健康检查
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD /usr/local/bin/health-check || exit 1
+
+# 启动命令
+CMD ["gateway-service"]

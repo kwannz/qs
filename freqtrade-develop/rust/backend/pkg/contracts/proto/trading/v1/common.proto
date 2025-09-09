@@ -1,0 +1,65 @@
+syntax = "proto3";
+package trading.v1;
+
+// 共享的基础消息类型
+
+// 任务确认响应
+message JobAck { 
+  string id = 1; 
+  int64 accepted_at_ms = 2; 
+  int64 estimate_ms = 3; 
+}
+
+// 任务ID查询
+message JobId { 
+  string id = 1; 
+}
+
+// 任务进度事件
+message ProgressEvent {
+  string id = 1;
+  string phase = 2; // INIT/RUN/AGGREGATE/FINALIZE/VALIDATE/SUBMIT/EXECUTE/SETTLE/COMPLETE
+  double percent = 3;
+  int64 eta_ms = 4;
+  string summary = 5;
+}
+
+// 通用错误响应
+message ErrorDetails {
+  string code = 1;
+  string message = 2;
+  map<string, string> details = 3;
+}
+
+// 分页请求
+message PageRequest {
+  int32 page = 1;
+  int32 page_size = 2;
+  string sort_by = 3;
+  string sort_order = 4; // ASC/DESC
+}
+
+// 分页响应
+message PageResponse {
+  int32 page = 1;
+  int32 page_size = 2;
+  int32 total_pages = 3;
+  int64 total_items = 4;
+}
+
+// 时间范围
+message TimeRange {
+  int64 start_ms = 1;
+  int64 end_ms = 2;
+}
+
+// 通用状态枚举
+enum Status {
+  STATUS_UNKNOWN = 0;
+  STATUS_PENDING = 1;
+  STATUS_RUNNING = 2;
+  STATUS_SUCCEEDED = 3;
+  STATUS_FAILED = 4;
+  STATUS_CANCELLED = 5;
+  STATUS_PARTIAL = 6;
+}

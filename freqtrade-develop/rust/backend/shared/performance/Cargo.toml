@@ -1,0 +1,55 @@
+[package]
+name = "platform-performance"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Async runtime
+tokio = { workspace = true }
+futures = { workspace = true }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Error handling
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+
+# Logging and tracing
+tracing = { workspace = true }
+
+# Database
+sqlx = { workspace = true }
+redis = { workspace = true }
+
+# Utilities
+uuid = { workspace = true }
+chrono = { workspace = true }
+
+# Configuration
+platform-config = { path = "../config" }
+
+# Caching
+moka = { version = "0.12", features = ["future"] }
+
+# Performance metrics
+prometheus = { workspace = true }
+
+# Concurrency
+dashmap = { workspace = true }
+parking_lot = "0.12"
+rayon = "1.8"
+
+# Memory pool
+object-pool = "0.5"
+
+# Performance optimization dependencies
+num_cpus = "1.16"
+fastrand = { workspace = true }
+
+[features]
+default = ["query_optimization", "caching", "connection_pooling"]
+query_optimization = []
+caching = []
+connection_pooling = []

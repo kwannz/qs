@@ -1,0 +1,21 @@
+# Local overrides for Historical DB workflow (copy to Makefile.local)
+
+# Path to your freqtrade config (used for exchange + backtest)
+HDB_CONFIG := user_data/config.json
+
+# Path to your historical data folder (personal/local backtest storage)
+HDB_DATADIR := historical\ data
+
+# Default pairs/timeframes/timerange for prep and backtest
+HDB_PAIRS := BTC/USDT ETH/USDT
+HDB_TFS := 5m 1h
+HDB_TIMERANGE := 20240101-20240701
+
+# Parallel jobs for scanning
+HDB_JOBS := 4
+
+# Strategy for backtest target
+HDB_STRATEGY := SampleStrategy
+
+# Python interpreter to use
+PYTHON := python
