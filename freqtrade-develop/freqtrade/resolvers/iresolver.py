@@ -20,19 +20,28 @@ logger = logging.getLogger(__name__)
 
 
 class PathModifier:
-    def __init__(self, path: Path):
+    def __init__(self, path: Path, extra_paths: list[Path] | None = None):
         self.path = path
+        self.extra_paths = extra_paths or []
 
     def __enter__(self):
-        """Inject path to allow importing with relative imports."""
+        """Inject path to allow importing with relative imports and extra roots."""
         sys.path.insert(0, str(self.path))
+        for p in self.extra_paths:
+            sp = str(p)
+            if sp not in sys.path:
+                sys.path.insert(0, sp)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        """Undo insertion of local path."""
+        """Undo insertion of local and extra paths."""
         str_path = str(self.path)
         if str_path in sys.path:
             sys.path.remove(str_path)
+        for p in self.extra_paths:
+            sp = str(p)
+            if sp in sys.path:
+                sys.path.remove(sp)
 
 
 class IResolver:
@@ -47,6 +56,8 @@ class IResolver:
     initial_search_path: Path | None = None
     # Optional config setting containing a path (strategy_path, freqaimodel_path)
     extra_path: str | None = None
+    # Extra import/search roots (used for complex strategies)
+    _extra_import_paths: list[Path] = []
 
     @classmethod
     def build_search_paths(
@@ -70,6 +81,17 @@ class IResolver:
         if cls.extra_path and (extra := config.get(cls.extra_path)):
             abs_paths.insert(0, Path(extra).resolve())
 
+        # Strategy-specific: allow additional import roots via `strategy_import_paths`.
+        # This enables complex/multi-file strategies living outside the default folder.
+        try:
+            if getattr(cls, "object_type_str", "").lower() == "strategy":
+                cls._extra_import_paths = [Path(p).resolve() for p in (config.get("strategy_import_paths", []) or [])]
+                for p in cls._extra_import_paths:
+                    abs_paths.insert(0, p)
+        except Exception:
+            # Do not fail path building due to config issues
+            pass
+
         return abs_paths
 
     @classmethod
@@ -88,7 +110,7 @@ class IResolver:
 
         # Generate spec based on absolute path
         # Pass object_name as first argument to have logging print a reasonable name.
-        with PathModifier(module_path.parent):
+        with PathModifier(module_path.parent, getattr(cls, "_extra_import_paths", [])):
             module_name = module_path.stem or ""
             spec = importlib.util.spec_from_file_location(module_name, str(module_path))
             if not spec:
@@ -110,12 +132,16 @@ class IResolver:
                     return iter([None])
 
             def is_valid_class(obj):
+                """
+                Accept any subclass of the expected object type that is exposed by the module.
+                This relaxes the previous restriction requiring the class to be defined in the
+                same file (obj.__module__ == module_name), enabling complex, multi-file strategies.
+                """
                 try:
                     return (
                         inspect.isclass(obj)
                         and issubclass(obj, cls.object_type)
                         and obj is not cls.object_type
-                        and obj.__module__ == module_name
                     )
                 except TypeError:
                     return False

@@ -56,6 +56,11 @@ CONF_SCHEMA = {
             "minimum": 0.0001,
             "pattern": UNLIMITED_STAKE_AMOUNT,
         },
+        "strategy_import_paths": {
+            "description": "Additional directories to add to import path for strategies (advanced/multi-file strategies).",
+            "type": "array",
+            "items": {"type": "string"},
+        },
         "tradable_balance_ratio": {
             "description": "Ratio of balance that is tradable.",
             "type": "number",
@@ -756,7 +761,26 @@ CONF_SCHEMA = {
                     "enum": ["error", "info"],
                 },
             },
-            "required": ["enabled", "listen_ip_address", "listen_port", "username", "password"],
+            "anyOf": [
+                {
+                    "required": [
+                        "enabled",
+                        "listen_ip_address",
+                        "listen_port",
+                        "username",
+                        "password",
+                    ]
+                },
+                {
+                    "required": [
+                        "enabled",
+                        "listen_ip_address",
+                        "listen_port",
+                        "auth_disabled",
+                    ],
+                    "properties": {"auth_disabled": {"const": True}},
+                },
+            ],
         },
         # end of RPC section
         "db_url": {

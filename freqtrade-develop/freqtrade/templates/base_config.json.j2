@@ -15,6 +15,8 @@
 {{- ('\n    "timeframe": "' + timeframe + '",') if timeframe else '' }}
     "dry_run": {{ dry_run | lower }},
     "dry_run_wallet": 1000,
+    // Optional: add extra import roots for complex strategies
+    // "strategy_import_paths": ["user_data/strategies", "user_data/strategies/lib"],
     "cancel_open_orders_on_exit": false,
     "trading_mode": "{{ trading_mode }}",
     "margin_mode": "{{ margin_mode }}",
@@ -54,9 +56,9 @@
         "listen_port": 8080,
         "verbosity": "error",
         "enable_openapi": false,
-        // For personal/local-only use, you may keep auth disabled and bind to 127.0.0.1 only.
+        // Personal/local-only use: auth disabled and bound to 127.0.0.1.
         // Do NOT expose this configuration to public networks.
-        // "auth_disabled": true,
+        "auth_disabled": true,
         "jwt_secret_key": "{{ api_server_jwt_key }}",
         "ws_token": "{{ api_server_ws_token }}",
         "CORS_origins": [],
@@ -67,9 +69,10 @@
         "ws_max_messages_per_sec": 10,
         "ws_max_message_bytes": 65536,
         "ws_idle_timeout": 120,
-        "ws_heartbeat_interval": 30,
-        "username": "{{ api_server_username }}",
-        "password": "{{ api_server_password }}"
+        "ws_heartbeat_interval": 30
+        // Credentials are not required when auth_disabled is true.
+        // "username": "{{ api_server_username }}",
+        // "password": "{{ api_server_password }}"
     },
     "bot_name": "freqtrade",
     "initial_state": "running",

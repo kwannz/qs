@@ -1,2 +1,0 @@
-"""qs package root."""
-
