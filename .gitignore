@@ -56,3 +56,10 @@ logs/
 # 忽略临时文件
 *.tmp
 *.temp
+
+# 忽略大文件（超过GitHub限制）
+freqtrade-develop/tests/performance/data/large_dataset.json
+freqtrade-develop/tests/performance/data/medium_dataset.json
+freqtrade-develop/tests/performance/data/trades_large.pkl
+freqtrade-develop/tests/performance/data/trades_medium.pkl
+freqtrade-develop/tests/performance/data/trades_small.pkl
