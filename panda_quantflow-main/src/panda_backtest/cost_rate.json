@@ -1,0 +1,434 @@
+{
+	"AL": {
+		"ProductClass": "AL",
+		"CostType": 0,
+		"CostRate": 3,
+		"CloseTdCostRate": 3
+	},
+	"SN": {
+		"ProductClass": "SN",
+		"CostType": 0,
+		"CostRate": 3,
+		"CloseTdCostRate": 3
+	},
+	"RU": {
+		"ProductClass": "RU",
+		"CostType": 0,
+		"CostRate": 3,
+		"CloseTdCostRate": 0
+	},
+	"WR": {
+		"ProductClass": "WR",
+		"CostType": 1,
+		"CostRate": 0.00004,
+		"CloseTdCostRate": 0
+	},
+	"RB": {
+		"ProductClass": "RB",
+		"CostType": 1,
+		"CostRate": 0.0001,
+		"CloseTdCostRate": 0.0003
+	},
+	"FU": {
+		"ProductClass": "FU",
+		"CostType": 1,
+		"CostRate": 0.00005,
+		"CloseTdCostRate": 0
+	},
+	"AU": {
+		"ProductClass": "AU",
+		"CostType": 0,
+		"CostRate": 10,
+		"CloseTdCostRate": 0
+	},
+	"CU": {
+		"ProductClass": "CU",
+		"CostType": 1,
+		"CostRate": 0.00005,
+		"CloseTdCostRate": 0.0001
+	},
+	"AG": {
+		"ProductClass": "AG",
+		"CostType": 1,
+		"CostRate": 0.00005,
+		"CloseTdCostRate": 0.00005
+	},
+	"PB": {
+		"ProductClass": "PB",
+		"CostType": 1,
+		"CostRate": 0.00004,
+		"CloseTdCostRate": 0
+	},
+	"NI": {
+		"ProductClass": "NI",
+		"CostType": 0,
+		"CostRate": 3,
+		"CloseTdCostRate": 3
+	},
+	"HC": {
+		"ProductClass": "HC",
+		"CostType": 1,
+		"CostRate": 0.0001,
+		"CloseTdCostRate": 0.0003
+	},
+	"ZN": {
+		"ProductClass": "ZN",
+		"CostType": 0,
+		"CostRate": 3,
+		"CloseTdCostRate": 0
+	},
+	"BU": {
+		"ProductClass": "BU",
+		"CostType": 1,
+		"CostRate": 0.0001,
+		"CloseTdCostRate": 0.0001
+	},
+	"SP": {
+		"ProductClass": "SP",
+		"CostType": 0,
+		"CostRate": 0.00005,
+		"CloseTdCostRate": 0
+	},
+	"SS": {
+		"ProductClass": "SS",
+		"CostType": 0,
+		"CostRate": 10,
+		"CloseTdCostRate": 20
+	},
+	"LU": {
+		"ProductClass": "LU",
+		"CostType": 1,
+		"CostRate": 0.00001,
+		"CloseTdCostRate": 0.00001
+	},
+	"SC": {
+		"ProductClass": "SC",
+		"CostType": 0,
+		"CostRate": 20,
+		"CloseTdCostRate": 0
+	},
+	"NR": {
+		"ProductClass": "NR",
+		"CostType": 1,
+		"CostRate": 0.00002,
+		"CloseTdCostRate": 0
+	},
+	"P": {
+		"ProductClass": "P",
+		"CostType": 0,
+		"CostRate": 2.5,
+		"CloseTdCostRate": 2.5
+	},
+	"BB": {
+		"ProductClass": "BB",
+		"CostType": 1,
+		"CostRate": 0.0001,
+		"CloseTdCostRate": 0.00005
+	},
+	"JD": {
+		"ProductClass": "JD",
+		"CostType": 1,
+		"CostRate": 0.00015,
+		"CloseTdCostRate": 0.00015
+	},
+	"J": {
+		"ProductClass": "J",
+		"CostType": 1,
+		"CostRate": 0.0006,
+		"CloseTdCostRate": 0.0006
+	},
+	"L": {
+		"ProductClass": "L",
+		"CostType": 0,
+		"CostRate": 1,
+		"CloseTdCostRate": 1
+	},
+	"PP": {
+		"ProductClass": "PP",
+		"CostType": 0,
+		"CostRate": 1,
+		"CloseTdCostRate": 1
+	},
+	"I": {
+		"ProductClass": "I",
+		"CostType": 1,
+		"CostRate": 0.0001,
+		"CloseTdCostRate": 0.0001
+	},
+	"M": {
+		"ProductClass": "M",
+		"CostType": 0,
+		"CostRate": 1.5,
+		"CloseTdCostRate": 1.5
+	},
+	"C": {
+		"ProductClass": "C",
+		"CostType": 0,
+		"CostRate": 1.2,
+		"CloseTdCostRate": 0
+	},
+	"JM": {
+		"ProductClass": "JM",
+		"CostType": 1,
+		"CostRate": 0.0006,
+		"CloseTdCostRate": 0.0006
+	},
+	"FB": {
+		"ProductClass": "FB",
+		"CostType": 1,
+		"CostRate": 0.0001,
+		"CloseTdCostRate": 0.0001
+	},
+	"CS": {
+		"ProductClass": "CS",
+		"CostType": 0,
+		"CostRate": 0.2,
+		"CloseTdCostRate": 0
+	},
+	"EG": {
+		"ProductClass": "EG",
+		"CostType": 0,
+		"CostRate": 3,
+		"CloseTdCostRate": 0
+	},
+	"EB": {
+		"ProductClass": "EB",
+		"CostType": 0,
+		"CostRate": 3,
+		"CloseTdCostRate": 3
+	},
+	"RR": {
+		"ProductClass": "RR",
+		"CostType": 0,
+		"CostRate": 0.2,
+		"CloseTdCostRate": 0.2
+	},
+	"A": {
+		"ProductClass": "A",
+		"CostType": 0,
+		"CostRate": 2,
+		"CloseTdCostRate": 2
+	},
+	"B": {
+		"ProductClass": "B",
+		"CostType": 0,
+		"CostRate": 1,
+		"CloseTdCostRate": 1
+	},
+	"V": {
+		"ProductClass": "V",
+		"CostType": 0,
+		"CostRate": 1,
+		"CloseTdCostRate": 1
+	},
+	"PG": {
+		"ProductClass": "PG",
+		"CostType": 0,
+		"CostRate": 6,
+		"CloseTdCostRate": 6
+	},
+	"Y": {
+		"ProductClass": "Y",
+		"CostType": 0,
+		"CostRate": 2.5,
+		"CloseTdCostRate": 0
+	},
+	"SM": {
+		"ProductClass": "SM",
+		"CostType": 0,
+		"CostRate": 9,
+		"CloseTdCostRate": 9
+	},
+	"SR": {
+		"ProductClass": "SR",
+		"CostType": 0,
+		"CostRate": 3,
+		"CloseTdCostRate": 0
+	},
+	"RM": {
+		"ProductClass": "RM",
+		"CostType": 0,
+		"CostRate": 1.5,
+		"CloseTdCostRate": 0
+	},
+	"RS": {
+		"ProductClass": "RS",
+		"CostType": 0,
+		"CostRate": 2,
+		"CloseTdCostRate": 2
+	},
+	"RI": {
+		"ProductClass": "RI",
+		"CostType": 0,
+		"CostRate": 2.5,
+		"CloseTdCostRate": 2.5
+	},
+	"ER": {
+		"ProductClass": "RI",
+		"CostType": 0,
+		"CostRate": 2.5,
+		"CloseTdCostRate": 2.5
+	},
+	"TA": {
+		"ProductClass": "TA",
+		"CostType": 0,
+		"CostRate": 3,
+		"CloseTdCostRate": 0
+	},
+	"ZC": {
+		"ProductClass": "ZC",
+		"CostType": 0,
+		"CostRate": 4,
+		"CloseTdCostRate": 4
+	},
+	"LR": {
+		"ProductClass": "LR",
+		"CostType": 0,
+		"CostRate": 3,
+		"CloseTdCostRate": 3
+	},
+	"MA": {
+		"ProductClass": "MA",
+		"CostType": 0,
+		"CostRate": 2,
+		"CloseTdCostRate": 6
+	},
+	"JR": {
+		"ProductClass": "JR",
+		"CostType": 0,
+		"CostRate": 3,
+		"CloseTdCostRate": 3
+	},
+	"SF": {
+		"ProductClass": "SF",
+		"CostType": 0,
+		"CostRate": 9,
+		"CloseTdCostRate": 9
+	},
+	"OI": {
+		"ProductClass": "OI",
+		"CostType": 0,
+		"CostRate": 2,
+		"CloseTdCostRate": 0
+	},
+	"CF": {
+		"ProductClass": "CF",
+		"CostType": 0,
+		"CostRate": 4.3,
+		"CloseTdCostRate": 0
+	},
+	"FG": {
+		"ProductClass": "FG",
+		"CostType": 0,
+		"CostRate": 6,
+		"CloseTdCostRate": 6
+	},
+	"PM": {
+		"ProductClass": "PM",
+		"CostType": 0,
+		"CostRate": 5,
+		"CloseTdCostRate": 5
+	},
+	"WH": {
+		"ProductClass": "WH",
+		"CostType": 0,
+		"CostRate": 5,
+		"CloseTdCostRate": 5
+	},
+	"CY": {
+		"ProductClass": "CY",
+		"CostType": 0,
+		"CostRate": 4,
+		"CloseTdCostRate": 0
+	},
+	"AP": {
+		"ProductClass": "AP",
+		"CostType": 0,
+		"CostRate": 5,
+		"CloseTdCostRate": 20
+	},
+	"CJ": {
+		"ProductClass": "CJ",
+		"CostType": 0,
+		"CostRate": 3,
+		"CloseTdCostRate": 3
+	},
+	"UR": {
+		"ProductClass": "UR",
+		"CostType": 0,
+		"CostRate": 5,
+		"CloseTdCostRate": 5
+	},
+	"SA": {
+		"ProductClass": "AP",
+		"CostType": 0,
+		"CostRate": 3.5,
+		"CloseTdCostRate": 0
+	},
+	"IF": {
+		"ProductClass": "IF",
+		"CostType": 1,
+		"CostRate": 0.000023,
+		"CloseTdCostRate": 0.000345
+	},
+	"IC": {
+		"ProductClass": "IC",
+		"CostType": 1,
+		"CostRate": 0.000023,
+		"CloseTdCostRate": 0.000345
+	},
+	"IH": {
+		"ProductClass": "IH",
+		"CostType": 1,
+		"CostRate": 0.000023,
+		"CloseTdCostRate": 0.000345
+	},
+	"TF": {
+		"ProductClass": "TF",
+		"CostType": 0,
+		"CostRate": 3.03,
+		"CloseTdCostRate": 0
+	},
+	"T": {
+		"ProductClass": "T",
+		"CostType": 0,
+		"CostRate": 3.03,
+		"CloseTdCostRate": 0
+	},
+	"TS": {
+		"ProductClass": "TS",
+		"CostType": 0,
+		"CostRate": 3.03,
+		"CloseTdCostRate": 0
+	},
+	"BC": {
+		"ProductClass": "BC",
+		"CostType": 1,
+		"CostRate": 0.00001,
+		"CloseTdCostRate": 0
+	},
+	"PF": {
+		"ProductClass": "PF",
+		"CostType": 0,
+		"CostRate": 3,
+		"CloseTdCostRate": 3
+	},
+	"PK": {
+		"ProductClass": "PK",
+		"CostType": 0,
+		"CostRate": 4,
+		"CloseTdCostRate": 4
+	},
+	"LH": {
+		"ProductClass": "LH",
+		"CostType": 1,
+		"CostRate": 0.0004,
+		"CloseTdCostRate": 0.0004
+	},
+		"LC": {
+		"ProductClass": "LC",
+		"CostType": 1,
+		"CostRate": 0.0004,
+		"CloseTdCostRate": 0.0004
+	}
+}

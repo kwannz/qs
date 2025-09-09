@@ -1,0 +1,73 @@
+[project]
+name = "panda_quantflow"
+version = "0.1.0"
+description = "PandaAI QuantFlow"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    # 核心依赖
+    "numpy>=1.22,<2.0",
+    "pandas>=2.2.3",
+    "fastapi>=0.68.0",
+    "uvicorn>=0.15.0",
+    "python-multipart>=0.0.5",
+    # 数据库相关
+    "pymongo",
+    "redis>=4.5.0",
+    "pymysql>=1.1.0",
+    "DBUtils>=3.0.2",
+    "motor>=3.0.0",
+    # 日志和配置
+    "loguru>=0.6.0",
+    "PyYAML>=6.0",
+    "python-json-logger>=2.0.7",
+    # 机器学习相关
+    "xgboost",
+    "scikit-learn",
+    "tqdm",
+    # 数据处理和验证
+    "python-dateutil>=2.8.2",
+    "pytz>=2023.3",
+    "pydantic>=2.0.0",
+    # 机器学习模型
+    "tensorflow",
+    "lightgbm>=4.6.0",
+    "openpyxl>=3.1.5",
+    "tushare>=1.4.21",
+    "ratelimit>=2.2.1",
+    "statsmodels>=0.14.4",
+    "python-snappy>=0.7.3",
+    "matplotlib>=3.9.4",
+    "tornado>=6.5",
+    "rqdatac>=3.2.2",
+    #其它
+    "cloudpickle>=3.1.1",
+    "torch>=2.7.0",
+    "aio-pika>=9.5.5",
+    "asyncio>=3.4.3",
+    "jsonpickle",
+    "async_timeout",
+    "json2html",
+    "uuid6",
+    "python-dotenv",
+    "python-socketio",
+    "openai>=1.0.0",
+    "dotenv>=0.9.9",
+    "ipython>=9.2.0",
+]
+
+[dependency-groups]
+dev = ["pytest>=8.3.5", "pytest-asyncio", "httpx", "jupyterlab>=3.5.0"]
+
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project.optional-dependencies]
+dev = ["pytest>=8.3.5", "pytest-asyncio", "httpx", "jupyterlab>=3.5.0"]
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
