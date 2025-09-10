@@ -16,38 +16,41 @@ class DatabaseHandler:
     def __init__(self, config):
         if not hasattr(self, 'initialized'):  # Prevent re-initialization
 
-            # URL encode the password to avoid authentication issues with special characters
-            encoded_password = urllib.parse.quote_plus(config["MONGO_PASSWORD"])
+            # Build connection string (support no-auth when MONGO_USER is empty)
+            mongo_host = config["MONGO_URI"]
+            username = (config.get("MONGO_USER") or "").strip()
+            password = (config.get("MONGO_PASSWORD") or "").strip()
+            auth_db = (config.get("MONGO_AUTH_DB") or "").strip()
+            use_auth = bool(username)
 
-            # Build connection string
-            MONGO_URI = f'mongodb://{config["MONGO_USER"]}:{encoded_password}@{config["MONGO_URI"]}/{config["MONGO_AUTH_DB"]}'
-            if (config['MONGO_TYPE']=='single'):
-                self.mongo_client = pymongo.MongoClient(
-                    MONGO_URI,
-                    readPreference='secondaryPreferred',  # Prefer reading from secondary nodes
-                    w='majority',  # Write concern level
-                    retryWrites=True,  # Automatically retry write operations
-                    socketTimeoutMS=30000,  # Socket timeout
-                    connectTimeoutMS=20000,  # Connection timeout
-                    serverSelectionTimeoutMS=30000,  # Server selection timeout
-                    authSource=config["MONGO_AUTH_DB"],  # Explicitly specify authentication database
-                )
-            elif (config['MONGO_TYPE']=='replica_set'):
-                MONGO_URI += f'?replicaSet={config["MONGO_REPLICA_SET"]}'
-                self.mongo_client = pymongo.MongoClient(
-                    MONGO_URI,
-                    readPreference='secondaryPreferred',  # Prefer reading from secondary nodes
-                    w='majority',  # Write concern level
-                    retryWrites=True,  # Automatically retry write operations
-                    socketTimeoutMS=30000,  # Socket timeout
-                    connectTimeoutMS=20000,  # Connection timeout
-                    serverSelectionTimeoutMS=30000,  # Server selection timeout
-                    authSource=config["MONGO_AUTH_DB"],  # Explicitly specify authentication database
-                )
+            if use_auth:
+                encoded_password = urllib.parse.quote_plus(password)
+                base_uri = f'mongodb://{username}:{encoded_password}@{mongo_host}'
+            else:
+                base_uri = f'mongodb://{mongo_host}'
+
+            # Append replicaSet if needed
+            if config.get('MONGO_TYPE') == 'replica_set':
+                base_uri = f"{base_uri}?replicaSet={config['MONGO_REPLICA_SET']}"
+
+            # Build client kwargs
+            client_kwargs = dict(
+                readPreference='secondaryPreferred',
+                w='majority',
+                retryWrites=True,
+                socketTimeoutMS=30000,
+                connectTimeoutMS=20000,
+                serverSelectionTimeoutMS=30000,
+            )
+            if use_auth and auth_db:
+                client_kwargs['authSource'] = auth_db
+
+            self.mongo_client = pymongo.MongoClient(base_uri, **client_kwargs)
 
             # Print connection string with masked password
-            masked_uri = MONGO_URI
-            masked_uri = masked_uri.replace(urllib.parse.quote_plus(config["MONGO_PASSWORD"]), "****")
+            masked_uri = base_uri
+            if use_auth:
+                masked_uri = masked_uri.replace(urllib.parse.quote_plus(password), "****")
             # Test if connection is successful
             try:
                 # Send ping command to database

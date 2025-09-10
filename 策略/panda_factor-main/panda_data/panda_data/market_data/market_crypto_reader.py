@@ -54,12 +54,13 @@ class MarketCryptoReader:
             "crypto_market",
         )
 
+        logger.debug(f"crypto_daily.query: {query} projection={projection}")
         cursor = collection.find(query, projection=projection)
         df = pd.DataFrame(list(cursor))
+        logger.debug(f"crypto_daily.count: {len(df)}")
         if df.empty:
             logger.warning("No crypto market data found for the specified parameters")
             return None
         if '_id' in df.columns:
             df = df.drop(columns=['_id'])
         return df
-

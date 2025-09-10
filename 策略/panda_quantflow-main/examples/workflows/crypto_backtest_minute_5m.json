@@ -1,0 +1,50 @@
+{
+  "name": "crypto_backtest_minute_5m",
+  "description": "CryptoBacktestControl with 1m data resampled to 5min",
+  "format_version": "1.0",
+  "litegraph": {
+    "last_node_id": 1,
+    "last_link_id": 0,
+    "nodes": [
+      {
+        "id": 1,
+        "type": "CryptoBacktestControl",
+        "pos": [100, 120],
+        "size": [340, 220],
+        "properties": {"title": "加密回测(5min)"}
+      }
+    ],
+    "links": []
+  },
+  "nodes": [
+    {
+      "uuid": "node-crypto-backtest-5m-1",
+      "name": "CryptoBacktestControl",
+      "title": "加密回测(5min)",
+      "type": "general",
+      "litegraph_id": 1,
+      "positionX": 100,
+      "positionY": 120,
+      "width": 340,
+      "height": 220,
+      "static_input_data": {
+        "frequency": "1m",
+        "resample_rule": "5min",
+        "symbols": "BINANCE:BTCUSDT,BINANCE:ETHUSDT",
+        "base_symbol": "BINANCE:BTCUSDT",
+        "start_date": "20240101",
+        "end_date": "20240101",
+        "start_capital": 100000.0,
+        "fee_rate": 1.0,
+        "slippage_bps": 2.0,
+        "maker_bps": 0.0,
+        "taker_bps": 5.0,
+        "max_weight": 0.6,
+        "max_turnover": 0.5,
+        "min_trade_weight": 0.01
+      }
+    }
+  ],
+  "links": []
+}
+

@@ -35,6 +35,8 @@ class UserLog(BaseModel):
     sequence: int = Field(default=0, description="日志在同一workflow中的序列号，从1开始自增，0表示待自动分配")
     workflow_id: Optional[str] = None
     error_detail: Optional[Any] = None
+    req_id: Optional[str] = Field(default=None, description="HTTP 请求ID（如果可用）")
+    backtest_id: Optional[str] = Field(default=None, description="回测ID（如果适用）")
 
     class Config:
         populate_by_name = True

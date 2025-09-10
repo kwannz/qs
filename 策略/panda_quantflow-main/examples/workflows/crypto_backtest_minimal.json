@@ -1,0 +1,49 @@
+{
+  "name": "crypto_backtest_minimal",
+  "description": "Minimal workflow to run CryptoBacktestControl",
+  "format_version": "1.0",
+  "litegraph": {
+    "last_node_id": 1,
+    "last_link_id": 0,
+    "nodes": [
+      {
+        "id": 1,
+        "type": "CryptoBacktestControl",
+        "pos": [100, 100],
+        "size": [320, 200],
+        "properties": {"title": "加密回测"}
+      }
+    ],
+    "links": []
+  },
+  "nodes": [
+    {
+      "uuid": "node-crypto-backtest-1",
+      "name": "CryptoBacktestControl",
+      "title": "加密回测",
+      "type": "general",
+      "litegraph_id": 1,
+      "positionX": 100,
+      "positionY": 100,
+      "width": 320,
+      "height": 200,
+      "static_input_data": {
+        "frequency": "1d",
+        "symbols": "BINANCE:BTCUSDT,BINANCE:ETHUSDT",
+        "base_symbol": "BINANCE:BTCUSDT",
+        "start_date": "20240101",
+        "end_date": "20240105",
+        "start_capital": 100000.0,
+        "fee_rate": 1.0,
+        "slippage_bps": 2.0,
+        "maker_bps": 0.0,
+        "taker_bps": 5.0,
+        "max_weight": 0.6,
+        "max_turnover": 0.5,
+        "min_trade_weight": 0.01
+      }
+    }
+  ],
+  "links": []
+}
+

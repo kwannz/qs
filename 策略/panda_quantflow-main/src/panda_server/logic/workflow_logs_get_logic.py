@@ -18,6 +18,8 @@ async def workflow_logs_get_logic(
     workflow_run_id: str,
     work_node_id: Optional[str] = None,
     log_level: Optional[str] = None,
+    req_id: Optional[str] = None,
+    backtest_id: Optional[str] = None,
     last_sequence: Optional[int] = None,
     limit: int = 5,
 ) -> QueryWorkflowLogsResponse:
@@ -91,6 +93,8 @@ async def workflow_logs_get_logic(
         workflow_run_id,
         work_node_id,
         log_level,
+        req_id,
+        backtest_id,
         last_sequence,
         limit + 1,  # 多查询一条来判断是否还有更多
     )
@@ -124,6 +128,8 @@ async def query_workflow_logs_with_filters(
     workflow_run_id: Optional[str] = None,
     work_node_id: Optional[str] = None,
     log_level: Optional[str] = None,
+    req_id: Optional[str] = None,
+    backtest_id: Optional[str] = None,
     last_sequence: Optional[int] = None,
     limit: int = 5
 ):
@@ -152,6 +158,10 @@ async def query_workflow_logs_with_filters(
         query["work_node_id"] = work_node_id
     if log_level:
         query["level"] = log_level
+    if req_id:
+        query["req_id"] = req_id
+    if backtest_id:
+        query["backtest_id"] = backtest_id
     
     # 分页逻辑：基于sequence字段
     if last_sequence is not None:

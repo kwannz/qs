@@ -343,6 +343,8 @@ async def query_workflow_logs(
     workflow_run_id: str = Query(..., description="工作流运行ID"),
     work_node_id: Optional[str] = Query(None, description="工作节点ID"),
     log_level: Optional[str] = Query(None, description="日志等级过滤"),
+    req_id: Optional[str] = Query(None, description="请求ID过滤 (x-request-id)"),
+    backtest_id: Optional[str] = Query(None, description="回测ID过滤"),
     last_sequence: Optional[int] = Query(
         None, description="起始序列号，从该序列号开始获取日志（包含该序列号）"
     ),
@@ -385,6 +387,8 @@ async def query_workflow_logs(
         workflow_run_id=workflow_run_id,
         work_node_id=work_node_id,
         log_level=log_level,
+        req_id=req_id,
+        backtest_id=backtest_id,
         last_sequence=last_sequence,
         limit=limit,
     )

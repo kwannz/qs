@@ -17,6 +17,7 @@ from common.logging.user_logger import UserLogger
 from panda_plugins.utils.time_util import TimeUtil
 from panda_plugins.utils.error_code import ErrorCode
 from panda_plugins.utils.work_node_loader import load_work_node_from_db, unload_work_node_from_db
+from common.logging.log_context import set_workflow_run_id, reset_workflow_run_id
 
 logger = logging.getLogger(__name__)
 
@@ -157,11 +158,10 @@ def generate_friendly_error_message(error, node, node_input_model, input_data):
 async def run_workflow_in_background(workflow_run_id):
     # 生成唯一执行ID
     execution_id = str(uuid.uuid4())[:8]
-    
+    # 设置日志上下文
+    token_wf = set_workflow_run_id(workflow_run_id)
     # 记录工作流开始执行的日志
-    logger.info(
-        f"[EXEC:{execution_id}] run_workflow_logic: start, workflow_run_id: {workflow_run_id}"
-    )
+    logger.info(f"[EXEC:{execution_id}] run_workflow_logic: start, workflow_run_id: {workflow_run_id}")
 
     # 从 mongodb 中获取 workflow run 信息
     workflow_run_collection = mongodb.get_collection("workflow_run")
@@ -460,6 +460,11 @@ async def run_workflow_in_background(workflow_run_id):
         {"_id": ObjectId(workflow_run_id)},
         {"$set": workflow_run_update_data.model_dump(exclude_unset=True)},
     )
+    # reset context var best-effort
+    try:
+        reset_workflow_run_id(token_wf)
+    except Exception:
+        pass
 
 
 async def is_workflow_run_terminated(workflow_run_id):

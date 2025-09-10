@@ -6,6 +6,7 @@ from bson import ObjectId
 import asyncio
 import json
 from .user_log_model import UserLog
+from common.logging.log_context import request_id_var, backtest_id_var
 from panda_server.config.database import mongodb
 from panda_server.config.env import (
     RUN_MODE,
@@ -111,7 +112,9 @@ class UserLogger:
             message=message,
             type="workflow_run",
             workflow_id=workflow_id,
-            error_detail=error_detail
+            error_detail=error_detail,
+            req_id=request_id_var.get(),
+            backtest_id=backtest_id_var.get(),
         )
         
         # 如果有workflow_run_id且sequence为0，自动生成序列号

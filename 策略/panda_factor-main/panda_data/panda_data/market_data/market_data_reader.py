@@ -71,13 +71,6 @@ class MarketDataReader:
         st = query_params['st']
 
         # Build query for this chunk
-        # query = {
-        #     "symbol": {"$in": symbols} if symbols else {"$exists": True},
-        #     "date": {
-        #         "$gte": start_date,
-        #         "$lte": end_date
-        #     }
-        # }
         query = {}
         if start_date == end_date:
             # 如果是同一天，直接精确匹配
@@ -89,15 +82,21 @@ class MarketDataReader:
                 "$lte": end_date
             }
 
-        if indicator != "000985":
-            if indicator == "000300":
-                query["index_component"] = "100"
-            elif indicator == "000905":
-                query["index_component"] = "010"
-            elif indicator == "000852":
-                query["index_component"] = "001"
-        if not st:
-            query["name"] = {"$not": {"$regex": "ST"}}
+        # 符号过滤：若提供 symbols，限制到指定标的，避免全表扫描
+        if symbols:
+            query["symbol"] = {"$in": symbols}
+
+        # 仅股票/期货走指数/ST 过滤；加密资产不适用这些字段
+        if type != 'crypto':
+            if indicator != "000985":
+                if indicator == "000300":
+                    query["index_component"] = "100"
+                elif indicator == "000905":
+                    query["index_component"] = "010"
+                elif indicator == "000852":
+                    query["index_component"] = "001"
+            if not st:
+                query["name"] = {"$not": {"$regex": "ST"}}
         # 构建投影
         projection = None
         if fields:
@@ -194,7 +193,7 @@ class MarketDataReader:
 
         # 将日期范围分成多个小块
         date_chunks = self._chunk_date_range(str(start_date), str(end_date))
-        print(date_chunks)
+        logger.debug(f"date_chunks: {date_chunks}")
 
         # 使用线程池并行处理每个块
         dfs = []
@@ -218,6 +217,7 @@ class MarketDataReader:
 
         end_time = time.time()
         logger.info(f"Market data query and conversion took {end_time - start_time:.2f} seconds")
+        logger.debug(f"final_df.shape: {final_df.shape}")
 
         return final_df
 

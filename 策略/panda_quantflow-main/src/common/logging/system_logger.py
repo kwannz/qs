@@ -2,10 +2,11 @@ import logging
 import logging.config
 from pathlib import Path
 from panda_server.config.env import LOG_FORMAT, LOG_LEVEL, LOG_CONSOLE, LOG_FILE, LOG_CONSOLE_ANSI
+from common.logging.log_context import ContextFilter
 from pythonjsonlogger import jsonlogger
 
 # 日志格式常量
-LOG_FORMAT_STRING = "%(asctime)s.%(msecs)03d %(levelname)-8s %(message)s"
+LOG_FORMAT_STRING = "%(asctime)s.%(msecs)03d %(levelname)-8s [rid=%(req_id)s wf=%(workflow_run_id)s bt=%(backtest_id)s] %(message)s"
 LOG_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 """
@@ -101,43 +102,45 @@ def get_log_config():
             "level": log_level,
             "formatter": console_formatter,
             "stream": "ext://sys.stdout",
+            "filters": ["context"],
         }
         handlers.append("console")
 
     if file_enabled:
         log_dir = setup_logging_directories()
         file_formatter = "json" if log_format == "json" else "plain"
-        handlers_config.update(
-            {
-                "file_debug": {
-                    "class": "logging.handlers.RotatingFileHandler",
-                    "level": "DEBUG",
-                    "formatter": file_formatter,  # 文件日志根据 log_format 选择
-                    "filename": str(log_dir / f"panda_debug.log"),
-                    "maxBytes": 10485760,
-                    "backupCount": 5,
-                    "encoding": "utf-8",
-                },
-                "file_info": {
-                    "class": "logging.handlers.RotatingFileHandler",
-                    "level": "INFO",
-                    "formatter": file_formatter,  # 文件日志根据 log_format 选择
-                    "filename": str(log_dir / f"panda_info.log"),
-                    "maxBytes": 10485760,
-                    "backupCount": 5,
-                    "encoding": "utf-8",
-                },
-                "file_error": {
-                    "class": "logging.handlers.RotatingFileHandler",
-                    "level": "ERROR",
-                    "formatter": file_formatter,  # 文件日志根据 log_format 选择
-                    "filename": str(log_dir / f"panda_error.log"),
-                    "maxBytes": 10485760,
-                    "backupCount": 5,
-                    "encoding": "utf-8",
-                },
-            }
-        )
+        handlers_config.update({
+            "file_debug": {
+                "class": "logging.handlers.RotatingFileHandler",
+                "level": "DEBUG",
+                "formatter": file_formatter,
+                "filename": str(log_dir / "panda_debug.log"),
+                "maxBytes": 10485760,
+                "backupCount": 5,
+                "encoding": "utf-8",
+                "filters": ["context"],
+            },
+            "file_info": {
+                "class": "logging.handlers.RotatingFileHandler",
+                "level": "INFO",
+                "formatter": file_formatter,
+                "filename": str(log_dir / "panda_info.log"),
+                "maxBytes": 10485760,
+                "backupCount": 5,
+                "encoding": "utf-8",
+                "filters": ["context"],
+            },
+            "file_error": {
+                "class": "logging.handlers.RotatingFileHandler",
+                "level": "ERROR",
+                "formatter": file_formatter,
+                "filename": str(log_dir / "panda_error.log"),
+                "maxBytes": 10485760,
+                "backupCount": 5,
+                "encoding": "utf-8",
+                "filters": ["context"],
+            },
+        })
         handlers.extend(["file_debug", "file_info", "file_error"])
 
     # 构建formatters配置
@@ -166,6 +169,11 @@ def get_log_config():
         "version": 1,
         "disable_existing_loggers": False,  # keep third-party loggers
         "formatters": formatters_config,
+        "filters": {
+            "context": {
+                '()': ContextFilter
+            }
+        },
         "handlers": handlers_config,
         "root": {
             "level": log_level,

@@ -16,10 +16,14 @@ from panda_server.routes import (
     plugins_routes,
     workflow_routes,
     backtest_route,
-    chat_routes,
 )
+# 可选加载 chat_routes（依赖较多），本地快速验证可通过环境变量禁用
+ENABLE_CHAT = os.getenv("ENABLE_CHAT_ROUTES", "0") in ("1", "true", "True")
+if ENABLE_CHAT:
+    from panda_server.routes import chat_routes  # type: ignore
 from starlette.staticfiles import StaticFiles
 from pathlib import Path
+from common.middleware.request_logging import RequestLoggingMiddleware
 
 from panda_server.routes.trading import (
     trading_routes,
@@ -110,6 +114,7 @@ mimetypes.add_type("text/css", ".css")
 mimetypes.add_type("application/javascript", ".js")
 app.mount("/quantflow", StaticFiles(directory=frontend_folder, html=True), name="quantflow")
 app.mount("/charts", StaticFiles(directory=frontend_folder, html=True), name="charts")
+app.mount("/logs", StaticFiles(directory=frontend_folder, html=True), name="logs")
 
 # Configure CORS
 app.add_middleware(
@@ -120,12 +125,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Request logging middleware (adds x-request-id and duration logs)
+app.add_middleware(RequestLoggingMiddleware)
+
 # Register routes
 app.include_router(base_routes.router)
 app.include_router(plugins_routes.router)
 app.include_router(workflow_routes.router)
 app.include_router(backtest_route.router)
-app.include_router(chat_routes.router)
+if ENABLE_CHAT:
+    app.include_router(chat_routes.router)
 
 app.include_router(trading_routes.router)
 

@@ -28,16 +28,16 @@ PASSWORD: xxxxxx
 
 
 # 数据库，注意：密码中包含特殊字符，在连接时会自动进行 URL 编码
-MONGO_USER: "panda"
-MONGO_PASSWORD: "panda"
+MONGO_USER: ""
+MONGO_PASSWORD: ""
 MONGO_URI: "127.0.0.1:27017"
-MONGO_AUTH_DB: "admin"
+MONGO_AUTH_DB: ""
 MONGO_DB: "panda"
 # 数据库类型配置说明：
 # - "single": 单节点模式，适用于开发环境或小型应用
 # - "replica_set": 副本集模式，提供高可用性和数据冗余
 # - "sharded": 分片模式，用于大规模数据存储（待实现）
-MONGO_TYPE: "replica_set"
+MONGO_TYPE: "single"
 MONGO_REPLICA_SET: "rs0"
 
 # OpenAI配置
@@ -50,3 +50,42 @@ LLM_BASE_URL: "https://api.deepseek.com/v1"
 LOG_LEVEL: "DEBUG"
 log_file: "logs/data_cleaner.log"
 log_rotation: "1 MB" 
+
+# 期货/永续合约统一配置（统一维护）
+# 可按交易所:合约符号（建议 EXCHANGE:SYMBOL 或 EXCHANGE:SYMBOL-PERP）维护参数
+# 字段说明：
+#  - contract_multiplier: 合约乘数（名义=price*qty*multiplier）
+#  - trade_unit: 最小交易数量
+#  - tick_size: 最小价格变动
+#  - min_notional: 最小名义
+#  - leverage: 杠杆（与 im/mm 二选一；优先 leverage）
+#  - im/mm: 初始/维持保证金（若未设定 leverage，可用此组）
+#  - maker_bps/taker_bps/slippage_bps: 手续费/滑点（基点）
+#  - funding_period: 资金费结算周期（如 8h/24h）
+#  - funding_rate: 固定资金费（演示用；生产可从外部曲线读取）
+FUTURES_DEFAULTS:
+  contract_multiplier: 1.0
+  trade_unit: 0.001
+  tick_size: 0.1
+  min_notional: 5.0
+  leverage: 10
+  im: 0.1
+  mm: 0.05
+  maker_bps: 0.0
+  taker_bps: 5.0
+  slippage_bps: 2.0
+  funding_period: "8h"
+  funding_rate: 0.0001
+
+FUTURES_CONTRACTS:
+  "BINANCE:BTCUSDT":
+    contract_multiplier: 1.0
+    trade_unit: 0.001
+    tick_size: 0.1
+    min_notional: 5.0
+    leverage: 10
+    maker_bps: 0.0
+    taker_bps: 5.0
+    slippage_bps: 2.0
+    funding_period: "8h"
+    funding_rate: 0.0001

@@ -66,10 +66,11 @@ class MarketCryptoMinReader:
             "crypto_market_1m",
         )
 
+        logger.debug(f"crypto_min.query: {query} projection={projection}")
         cursor = collection.find(query, projection=projection)
         df = pd.DataFrame(list(cursor))
+        logger.debug(f"crypto_min.count: {len(df)}")
         if df.empty:
             logger.warning("No crypto minute data found for the specified parameters")
             return None
         return df
-

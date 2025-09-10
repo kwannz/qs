@@ -3,44 +3,76 @@ import os
 import sys
 import inspect
 from datetime import datetime
+from logging.handlers import RotatingFileHandler
 from functools import wraps
 
-# TODO Read log level from config file
-# Create log directory
-log_dir = "logs"
-if not os.path.exists(log_dir):
-    os.makedirs(log_dir)
+def _ensure_dir(path: str) -> None:
+    if not os.path.exists(path):
+        os.makedirs(path, exist_ok=True)
 
-# Create log filenames (using current date)
-current_date = datetime.now().strftime("%Y%m%d")
-log_file = os.path.join(log_dir, f"panda_info_{current_date}.log")
-error_log_file = os.path.join(log_dir, f"panda_error_{current_date}.log")
 
-# Configure log format
-formatter = logging.Formatter(
-    '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S'
-)
+def _build_formatter(fmt: str = 'plain') -> logging.Formatter:
+    if fmt.lower() == 'json':
+        try:
+            from pythonjsonlogger import jsonlogger  # type: ignore
+            return jsonlogger.JsonFormatter('%(asctime)s %(name)s %(levelname)s %(message)s')
+        except Exception:
+            pass
+    return logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                             datefmt='%Y-%m-%d %H:%M:%S')
 
-# Create console handler
-console_handler = logging.StreamHandler()
-console_handler.setFormatter(formatter)
 
-# Create file handler
-file_handler = logging.FileHandler(log_file)
-file_handler.setFormatter(formatter)
+def _init_root_logger():
+    # Read env for runtime control
+    level = os.getenv('LOG_LEVEL', 'INFO').upper()
+    fmt = os.getenv('LOG_FORMAT', 'plain')
+    console_on = os.getenv('LOG_CONSOLE', '1') in ('1', 'true', 'True')
+    file_on = os.getenv('LOG_FILE', '1') in ('1', 'true', 'True')
+    log_dir = os.getenv('LOG_DIR', 'logs')
+    rotate_size = os.getenv('LOG_ROTATE_SIZE', '1048576')  # bytes, default 1MB
+    backup_count = int(os.getenv('LOG_BACKUP_COUNT', '5'))
 
-# Create error log file handler (only records ERROR level and above)
-error_file_handler = logging.FileHandler(error_log_file)
-error_file_handler.setFormatter(formatter)
-error_file_handler.setLevel(logging.ERROR)
+    try:
+        lvl = getattr(logging, level)
+    except Exception:
+        lvl = logging.INFO
 
-# Configure root logger
-root_logger = logging.getLogger()
-root_logger.setLevel(logging.INFO)
-root_logger.addHandler(console_handler)
-root_logger.addHandler(file_handler)
-root_logger.addHandler(error_file_handler)
+    formatter = _build_formatter(fmt)
+
+    root_logger = logging.getLogger()
+    root_logger.setLevel(lvl)
+
+    # Avoid duplicate handlers on re-import
+    if not getattr(root_logger, '_panda_logger_inited', False):
+        if console_on:
+            console_handler = logging.StreamHandler()
+            console_handler.setFormatter(formatter)
+            root_logger.addHandler(console_handler)
+
+        if file_on:
+            _ensure_dir(log_dir)
+            current_date = datetime.now().strftime('%Y%m%d')
+            info_path = os.path.join(log_dir, f'panda_info_{current_date}.log')
+            err_path = os.path.join(log_dir, f'panda_error_{current_date}.log')
+
+            try:
+                max_bytes = int(rotate_size)
+            except Exception:
+                max_bytes = 1_048_576
+
+            file_handler = RotatingFileHandler(info_path, maxBytes=max_bytes, backupCount=backup_count)
+            file_handler.setFormatter(formatter)
+            root_logger.addHandler(file_handler)
+
+            error_file_handler = RotatingFileHandler(err_path, maxBytes=max_bytes, backupCount=backup_count)
+            error_file_handler.setFormatter(formatter)
+            error_file_handler.setLevel(logging.ERROR)
+            root_logger.addHandler(error_file_handler)
+
+        setattr(root_logger, '_panda_logger_inited', True)
+
+
+_init_root_logger()
 
 def get_logger(module_name):
     """
@@ -53,8 +85,8 @@ def get_logger(module_name):
         Logger: Configured logger instance
     """
     logger = logging.getLogger(module_name)
-    # TODO Read log level from config file
-    logger.setLevel(logging.INFO)
+    # 级别跟随根 logger，可由环境变量控制
+    # 单独模块如需更细粒度，可自行 setLevel
     return logger
 
 # Global cache for created loggers to avoid duplicates
@@ -131,3 +163,10 @@ class Logger:
 
 # Create a single instance to be imported elsewhere
 logger = Logger()
+
+# Try attach context filter if available (for cross-project correlation IDs)
+try:
+    from common.logging.log_context import ContextFilter  # type: ignore
+    logging.getLogger().addFilter(ContextFilter())
+except Exception:
+    pass
